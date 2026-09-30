@@ -1,0 +1,311 @@
+{
+  "meta": {
+    "description": "Orion — a next-generation banking dashboard demo: fiat and crypto in one place"
+  },
+  "common": {
+    "appName": "Orion Bank",
+    "loading": "Loading…",
+    "goHome": "Go to home page",
+    "goToApp": "Open dashboard",
+    "comingSoon": "This section arrives in step {step}.",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "nav": {
+    "dashboard": "Overview",
+    "accounts": "Accounts & wallets",
+    "transactions": "Transactions",
+    "transfer": "Transfer",
+    "settings": "Settings"
+  },
+  "layout": {
+    "skipToContent": "Skip to content",
+    "mainNavigation": "Main navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "logout": "Log out",
+    "guest": "Guest",
+    "logoLabel": "Orion Bank — home",
+    "switchToLight": "Switch to light theme",
+    "switchToDark": "Switch to dark theme",
+    "language": "Language"
+  },
+  "errors": {
+    "title": "Error",
+    "generic": "Something went wrong. Try reloading the page.",
+    "notFoundTitle": "Page not found",
+    "notFoundText": "This page does not exist or has been moved.",
+    "retry": "Try again"
+  },
+  "pages": {
+    "login": {
+      "title": "Sign in",
+      "placeholder": "The sign-in form arrives in step 5."
+    },
+    "register": {
+      "title": "Create account",
+      "placeholder": "The sign-up form arrives in step 5."
+    },
+    "dashboard": {
+      "title": "Overview",
+      "description": "A summary of your assets"
+    },
+    "accounts": {
+      "title": "Accounts & wallets",
+      "description": "Fiat accounts and crypto wallets"
+    },
+    "transactions": {
+      "title": "Transactions",
+      "description": "Your transaction history"
+    },
+    "transfer": {
+      "title": "Transfer",
+      "description": "Send money"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Profile, appearance and security"
+    }
+  },
+  "uiKit": {
+    "title": "UI kit",
+    "description": "Building blocks of the Orion interface",
+    "sections": {
+      "buttons": "Buttons",
+      "badges": "Badges",
+      "forms": "Form fields",
+      "switches": "Switches",
+      "cards": "Cards",
+      "table": "Table",
+      "modal": "Modal",
+      "states": "Loading, empty and error states"
+    },
+    "buttons": {
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "outline": "Outline",
+      "ghost": "Ghost",
+      "danger": "Delete",
+      "small": "Small",
+      "large": "Large",
+      "loading": "Saving",
+      "disabled": "Disabled",
+      "withIcon": "Send money",
+      "asLink": "Link styled as button",
+      "iconLabel": "Add account"
+    },
+    "badges": {
+      "neutral": "Draft",
+      "brand": "New",
+      "success": "Completed",
+      "warning": "Pending",
+      "danger": "Failed"
+    },
+    "forms": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "emailHint": "We use it only for sign-in.",
+      "amountLabel": "Amount",
+      "amountError": "Amount exceeds the available balance",
+      "currencyLabel": "Currency",
+      "currencyPlaceholder": "Choose currency",
+      "searchLabel": "Search",
+      "searchPlaceholder": "Search transactions",
+      "disabledLabel": "Account number"
+    },
+    "switches": {
+      "twoFactor": "Two-factor authentication",
+      "twoFactorHint": "Ask for a code on every sign-in",
+      "notifications": "Email notifications"
+    },
+    "cards": {
+      "balanceTitle": "Total balance",
+      "balanceDescription": "Across all accounts",
+      "change": "{value} this month",
+      "actionsTitle": "Quick actions",
+      "actionsDescription": "Most frequent operations",
+      "topUp": "Top up",
+      "withdraw": "Withdraw"
+    },
+    "table": {
+      "caption": "Recent activity",
+      "date": "Date",
+      "description": "Description",
+      "status": "Status",
+      "amount": "Amount",
+      "rows": {
+        "coffee": "Coffee shop",
+        "salary": "Salary",
+        "btc": "BTC purchase",
+        "refund": "Card refund"
+      }
+    },
+    "modal": {
+      "open": "Open dialog",
+      "title": "Confirm transfer",
+      "description": "Check the details before sending.",
+      "recipientLabel": "Recipient",
+      "amountLabel": "Amount",
+      "feeLabel": "Fee",
+      "recipient": "Alex Morgan"
+    },
+    "states": {
+      "skeleton": "Skeleton",
+      "empty": "Empty",
+      "error": "Error",
+      "emptyTitle": "No transactions yet",
+      "emptyDescription": "Your activity will appear here.",
+      "emptyAction": "Make a transfer",
+      "errorDescription": "We couldn't load your transactions.",
+      "loadingLabel": "Loading transactions"
+    }
+  },
+  "landing": {
+    "nav": {
+      "label": "Sections",
+      "features": "Features",
+      "assets": "Fiat & crypto",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "login": "Log in",
+      "openAccount": "Open account"
+    },
+    "hero": {
+      "eyebrow": "Fiat and crypto in one account",
+      "title": "Banking that keeps up with your money",
+      "subtitle": "Hold euros, dollars and crypto side by side, send money in seconds and see every movement in one clean dashboard.",
+      "primaryCta": "Open an account",
+      "secondaryCta": "Log in",
+      "points": {
+        "fast": "Open in minutes",
+        "fees": "Transparent fees",
+        "support": "Support 24/7"
+      }
+    },
+    "preview": {
+      "label": "Dashboard preview",
+      "totalBalance": "Total balance",
+      "thisMonth": "{value} this month",
+      "accounts": {
+        "eur": "Euro account",
+        "usd": "Dollar account",
+        "btc": "Bitcoin wallet",
+        "eth": "Ethereum wallet"
+      }
+    },
+    "features": {
+      "title": "Everything you need for your money",
+      "subtitle": "The essentials of a modern account, designed to stay out of your way.",
+      "items": {
+        "transfers": {
+          "title": "Instant transfers",
+          "text": "Send money to anyone in seconds and see the fee before you confirm."
+        },
+        "security": {
+          "title": "Security by default",
+          "text": "Two-factor authentication and session control are built into every account."
+        },
+        "multicurrency": {
+          "title": "Many currencies",
+          "text": "Keep EUR, USD and GBP accounts and exchange between them at a clear rate."
+        },
+        "analytics": {
+          "title": "Clear analytics",
+          "text": "Track your balance over time and filter every transaction in a couple of clicks."
+        }
+      }
+    },
+    "assets": {
+      "eyebrow": "One place",
+      "title": "Fiat and crypto in one place",
+      "text": "No more juggling apps. Your bank accounts and crypto wallets live side by side, with one total balance and one history.",
+      "points": {
+        "balance": "One total balance in your base currency",
+        "exchange": "Exchange between fiat and crypto in two taps",
+        "history": "A single history for every account and wallet"
+      },
+      "cta": "Get started",
+      "exchange": {
+        "label": "Exchange",
+        "from": "You pay",
+        "to": "You get",
+        "rate": "1 BTC ≈ {rate}",
+        "fee": "Fee {fee}"
+      }
+    },
+    "pricing": {
+      "title": "Simple plans",
+      "subtitle": "Start free and upgrade when you need more.",
+      "perMonth": "per month",
+      "popular": "Popular",
+      "choose": "Choose {plan}",
+      "plans": {
+        "start": {
+          "name": "Start",
+          "description": "For everyday spending",
+          "features": {
+            "f1": "2 currency accounts",
+            "f2": "Free transfers between Orion users",
+            "f3": "BTC and ETH wallets"
+          }
+        },
+        "plus": {
+          "name": "Plus",
+          "description": "For travel and saving",
+          "features": {
+            "f1": "5 currency accounts",
+            "f2": "Lower exchange fees",
+            "f3": "All supported crypto assets"
+          }
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "For freelancers and power users",
+          "features": {
+            "f1": "Unlimited accounts",
+            "f2": "Priority support",
+            "f3": "Advanced analytics and exports"
+          }
+        }
+      }
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": {
+        "demo": {
+          "question": "Is Orion a real bank?",
+          "answer": "No. Orion is a demo project: balances, transactions and rates are simulated, and no real money moves."
+        },
+        "open": {
+          "question": "How do I open an account?",
+          "answer": "Click “Open an account”, enter any valid email and a password of at least 8 characters — the demo signs you in instantly."
+        },
+        "crypto": {
+          "question": "Which crypto assets are supported?",
+          "answer": "The demo includes Bitcoin, Ethereum, Tether and Solana wallets alongside euro, dollar and pound accounts."
+        },
+        "security": {
+          "question": "How is my account protected?",
+          "answer": "Settings include two-factor authentication and active session management. In the demo these controls are placeholders."
+        },
+        "fees": {
+          "question": "Are there any fees?",
+          "answer": "Every transfer shows its fee before you confirm. Fees are calculated by the demo for illustration only."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to try Orion?",
+      "text": "Open a demo account in under a minute — no documents needed.",
+      "button": "Open an account"
+    },
+    "footer": {
+      "tagline": "Next-generation banking demo: fiat and crypto in one account.",
+      "product": "Product",
+      "account": "Account",
+      "disclaimer": "Orion Bank is a fictional demo. It does not provide financial services, process payments or store personal data.",
+      "rights": "© {year} Orion Bank demo"
+    }
+  }
+}

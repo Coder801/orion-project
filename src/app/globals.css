@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --brand: 108 90 245;
+    --brand-strong: 150 136 255;
+    --brand-soft: 38 34 78;
+    --brand-fg: 255 255 255;
+    --accent: 45 212 191;
+
+    --surface: 11 13 20;
+    --surface-raised: 19 22 33;
+    --surface-overlay: 27 31 46;
+    --surface-sunken: 7 8 13;
+
+    --border: 36 41 59;
+    --border-strong: 55 62 87;
+
+    --fg: 236 238 245;
+    --fg-muted: 160 166 188;
+    --fg-subtle: 110 116 140;
+
+    --success: 52 211 153;
+    --warning: 251 191 36;
+    --danger: 248 113 113;
+    --danger-fg: 40 8 8;
+  }
+
+  :root.light {
+    color-scheme: light;
+    --brand: 91 72 240;
+    --brand-strong: 72 52 220;
+    --brand-soft: 236 233 255;
+    --brand-fg: 255 255 255;
+    --accent: 15 118 110;
+
+    --surface: 246 247 251;
+    --surface-raised: 255 255 255;
+    --surface-overlay: 255 255 255;
+    --surface-sunken: 236 238 244;
+
+    --border: 223 226 236;
+    --border-strong: 196 201 216;
+
+    --fg: 17 20 32;
+    --fg-muted: 82 89 112;
+    --fg-subtle: 120 127 150;
+
+    --success: 4 120 87;
+    --warning: 133 77 14;
+    --danger: 185 28 28;
+    --danger-fg: 255 255 255;
+  }
+
+  html {
+    @apply bg-surface text-fg antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  body {
+    @apply min-h-screen;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-surface;
+  }
+}
