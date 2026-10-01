@@ -1,53 +1,24 @@
-import { useId, type ComponentProps, type ReactNode } from 'react'
-import { controlClassName, Field, getFieldAria, type FieldOwnProps } from '@/components/ui/Field'
-import { cn } from '@/lib/cn'
+import * as React from "react";
 
-export interface InputProps extends ComponentProps<'input'>, FieldOwnProps {
-  /** Decorative content inside the field, e.g. an icon or currency sign. */
-  startAdornment?: ReactNode
-  endAdornment?: ReactNode
-  containerClassName?: string
-}
+import { cn } from "@/lib/utils";
 
-export function Input({
-  id: idProp,
-  label,
-  hint,
-  error,
-  startAdornment,
-  endAdornment,
-  className,
-  containerClassName,
-  ...props
-}: InputProps) {
-  const generatedId = useId()
-  const id = idProp ?? generatedId
-
-  return (
-    <Field id={id} label={label} hint={hint} error={error} className={containerClassName}>
-      <div className="relative">
-        {startAdornment && (
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-fg-subtle [&_svg]:size-4">
-            {startAdornment}
-          </span>
-        )}
+function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+    return (
         <input
-          id={id}
-          className={cn(
-            controlClassName,
-            startAdornment && 'pl-9',
-            endAdornment && 'pr-12',
-            className,
-          )}
-          {...getFieldAria(id, { hint, error })}
-          {...props}
+            type={type}
+            data-slot="input"
+            className={cn(
+                "flex h-10 w-full min-w-0 rounded-xl border border-input bg-transparent px-4 py-2 text-sm outline-hidden transition-colors",
+                "selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground",
+                "focus-visible:border-primary/60 focus-visible:ring-2 focus-visible:ring-ring/20",
+                "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+                "file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
+                "aria-invalid:border-destructive aria-invalid:ring-destructive/30",
+                className,
+            )}
+            {...props}
         />
-        {endAdornment && (
-          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-fg-subtle">
-            {endAdornment}
-          </span>
-        )}
-      </div>
-    </Field>
-  )
+    );
 }
+
+export { Input };

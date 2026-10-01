@@ -1,42 +1,75 @@
-import type { ComponentProps } from 'react'
-import { cn } from '@/lib/cn'
+import * as React from "react";
 
-export function Card({ className, ...props }: ComponentProps<'div'>) {
-  return (
-    <div
-      className={cn('rounded-xl border border-border bg-surface-raised shadow-card', className)}
-      {...props}
-    />
-  )
+import { cn } from "@/lib/utils";
+
+function Card({ className, ...props }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card"
+            className={cn(
+                "flex flex-col gap-6 rounded-2xl border bg-card py-6 text-card-foreground transition-colors",
+                className,
+            )}
+            {...props}
+        />
+    );
 }
 
-export function CardHeader({ className, ...props }: ComponentProps<'div'>) {
-  return (
-    <div className={cn('flex items-start justify-between gap-4 px-5 pt-5', className)} {...props} />
-  )
+function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card-header"
+            className={cn("flex flex-col gap-1.5 px-6", className)}
+            {...props}
+        />
+    );
 }
 
-interface CardTitleProps extends ComponentProps<'h2'> {
-  as?: 'h2' | 'h3'
+function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card-title"
+            className={cn("font-heading leading-none font-semibold", className)}
+            {...props}
+        />
+    );
 }
 
-export function CardTitle({ as: Heading = 'h2', className, ...props }: CardTitleProps) {
-  return <Heading className={cn('text-base font-semibold tracking-tight', className)} {...props} />
+function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card-description"
+            className={cn("text-sm text-muted-foreground", className)}
+            {...props}
+        />
+    );
 }
 
-export function CardDescription({ className, ...props }: ComponentProps<'p'>) {
-  return <p className={cn('mt-1 text-sm text-fg-muted', className)} {...props} />
+function CardContent({ className, ...props }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card-content"
+            className={cn("px-6", className)}
+            {...props}
+        />
+    );
 }
 
-export function CardContent({ className, ...props }: ComponentProps<'div'>) {
-  return <div className={cn('p-5', className)} {...props} />
+function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card-footer"
+            className={cn("flex items-center px-6", className)}
+            {...props}
+        />
+    );
 }
 
-export function CardFooter({ className, ...props }: ComponentProps<'div'>) {
-  return (
-    <div
-      className={cn('flex items-center gap-2 border-t border-border px-5 py-4', className)}
-      {...props}
-    />
-  )
-}
+export {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+    CardFooter,
+};

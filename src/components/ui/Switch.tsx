@@ -1,67 +1,34 @@
-import { useId, type ComponentProps } from 'react'
-import { cn } from '@/lib/cn'
+"use client";
 
-export interface SwitchProps extends Omit<ComponentProps<'button'>, 'onChange' | 'role'> {
-  checked: boolean
-  onCheckedChange: (checked: boolean) => void
-  label?: string
-  description?: string
+import * as React from "react";
+import { Switch as SwitchPrimitive } from "@base-ui/react/switch";
+
+import { cn } from "@/lib/utils";
+
+function Switch({
+    className,
+    ...props
+}: React.ComponentProps<typeof SwitchPrimitive.Root>) {
+    return (
+        <SwitchPrimitive.Root
+            data-slot="switch"
+            className={cn(
+                "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border border-transparent outline-hidden transition-colors",
+                "data-checked:bg-primary data-unchecked:bg-muted",
+                "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "disabled:cursor-not-allowed disabled:opacity-50 data-disabled:cursor-not-allowed data-disabled:opacity-50",
+                className,
+            )}
+            {...props}
+        >
+            <SwitchPrimitive.Thumb
+                data-slot="switch-thumb"
+                className={cn(
+                    "pointer-events-none block size-5 rounded-full bg-white shadow ring-0 transition-transform data-checked:translate-x-5.5 data-unchecked:translate-x-0.5 dark:data-unchecked:bg-foreground",
+                )}
+            />
+        </SwitchPrimitive.Root>
+    );
 }
 
-export function Switch({
-  checked,
-  onCheckedChange,
-  label,
-  description,
-  className,
-  disabled,
-  ...props
-}: SwitchProps) {
-  const id = useId()
-  const labelId = `${id}-label`
-  const descriptionId = `${id}-description`
-
-  const control = (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-labelledby={label ? labelId : undefined}
-      aria-describedby={description ? descriptionId : undefined}
-      disabled={disabled}
-      onClick={() => onCheckedChange(!checked)}
-      className={cn(
-        'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border border-transparent transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-        checked ? 'bg-brand' : 'bg-border-strong',
-        !label && className,
-      )}
-      {...props}
-    >
-      <span
-        aria-hidden
-        className={cn(
-          'size-5 rounded-full bg-white shadow transition-transform',
-          checked ? 'translate-x-5' : 'translate-x-0.5',
-        )}
-      />
-    </button>
-  )
-
-  if (!label) return control
-
-  return (
-    <div className={cn('flex items-start justify-between gap-4', className)}>
-      <div className="min-w-0">
-        <span id={labelId} className="block text-sm font-medium">
-          {label}
-        </span>
-        {description && (
-          <span id={descriptionId} className="mt-0.5 block text-xs text-fg-subtle">
-            {description}
-          </span>
-        )}
-      </div>
-      {control}
-    </div>
-  )
-}
+export { Switch };

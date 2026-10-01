@@ -1,0 +1,8 @@
+# graphify also honours .gitignore; these are extra exclusions for the knowledge graph.
+package-lock.json
+*.tsbuildinfo
+next-env.d.ts
+public/
+.claude/
+AGENTS.md
+theme/

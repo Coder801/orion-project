@@ -1,39 +1,40 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import type { Theme } from '@/types'
+import { createSlice } from "@reduxjs/toolkit";
 
+// Colour theme is owned by next-themes; this slice only holds layout state.
 export interface UiState {
-  theme: Theme
-  isSidebarOpen: boolean
+    /** Mobile navigation drawer. */
+    isSidebarOpen: boolean;
+    /** Desktop sidebar collapsed to icons. */
+    isSidebarCollapsed: boolean;
 }
 
 export const initialUiState: UiState = {
-  theme: 'dark',
-  isSidebarOpen: false,
-}
+    isSidebarOpen: false,
+    isSidebarCollapsed: false,
+};
 
 const uiSlice = createSlice({
-  name: 'ui',
-  initialState: initialUiState,
-  reducers: {
-    themeChanged(state, action: PayloadAction<Theme>) {
-      state.theme = action.payload
+    name: "ui",
+    initialState: initialUiState,
+    reducers: {
+        sidebarOpened(state) {
+            state.isSidebarOpen = true;
+        },
+        sidebarClosed(state) {
+            state.isSidebarOpen = false;
+        },
+        sidebarCollapseToggled(state) {
+            state.isSidebarCollapsed = !state.isSidebarCollapsed;
+        },
     },
-    themeToggled(state) {
-      state.theme = state.theme === 'dark' ? 'light' : 'dark'
+    selectors: {
+        selectIsSidebarOpen: (state) => state.isSidebarOpen,
+        selectIsSidebarCollapsed: (state) => state.isSidebarCollapsed,
     },
-    sidebarOpened(state) {
-      state.isSidebarOpen = true
-    },
-    sidebarClosed(state) {
-      state.isSidebarOpen = false
-    },
-  },
-  selectors: {
-    selectTheme: (state) => state.theme,
-    selectIsSidebarOpen: (state) => state.isSidebarOpen,
-  },
-})
+});
 
-export const { themeChanged, themeToggled, sidebarOpened, sidebarClosed } = uiSlice.actions
-export const { selectTheme, selectIsSidebarOpen } = uiSlice.selectors
-export const uiReducer = uiSlice.reducer
+export const { sidebarOpened, sidebarClosed, sidebarCollapseToggled } =
+    uiSlice.actions;
+export const { selectIsSidebarOpen, selectIsSidebarCollapsed } =
+    uiSlice.selectors;
+export const uiReducer = uiSlice.reducer;

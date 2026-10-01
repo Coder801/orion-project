@@ -1,31 +1,46 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import type { User } from '@/types'
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { SessionUser } from "@/types";
 
 export interface AuthState {
-  user: User | null
+    user: SessionUser | null;
+    /** Set by an explicit sign-out so guards don't bounce to the sign-in page. */
+    signedOut: boolean;
 }
 
 export const initialAuthState: AuthState = {
-  user: null,
-}
+    user: null,
+    signedOut: false,
+};
 
 const authSlice = createSlice({
-  name: 'auth',
-  initialState: initialAuthState,
-  reducers: {
-    loggedIn(state, action: PayloadAction<User>) {
-      state.user = action.payload
+    name: "auth",
+    initialState: initialAuthState,
+    reducers: {
+        loggedIn(state, action: PayloadAction<SessionUser>) {
+            state.user = action.payload;
+            state.signedOut = false;
+        },
+        loggedOut(state) {
+            state.user = null;
+            state.signedOut = true;
+        },
+        sessionUpdated(state, action: PayloadAction<Partial<SessionUser>>) {
+            if (state.user) state.user = { ...state.user, ...action.payload };
+        },
     },
-    loggedOut(state) {
-      state.user = null
+    selectors: {
+        selectUser: (state) => state.user,
+        selectIsAuthenticated: (state) => state.user !== null,
+        selectUserId: (state) => state.user?.id ?? null,
+        selectSignedOut: (state) => state.signedOut,
     },
-  },
-  selectors: {
-    selectUser: (state) => state.user,
-    selectIsAuthenticated: (state) => state.user !== null,
-  },
-})
+});
 
-export const { loggedIn, loggedOut } = authSlice.actions
-export const { selectUser, selectIsAuthenticated } = authSlice.selectors
-export const authReducer = authSlice.reducer
+export const { loggedIn, loggedOut, sessionUpdated } = authSlice.actions;
+export const {
+    selectUser,
+    selectIsAuthenticated,
+    selectUserId,
+    selectSignedOut,
+} = authSlice.selectors;
+export const authReducer = authSlice.reducer;

@@ -1,40 +1,63 @@
-import type { ComponentProps } from 'react'
-import { cn } from '@/lib/cn'
+import * as React from "react";
+import { useRender } from "@base-ui/react/use-render";
+import { cva, type VariantProps } from "class-variance-authority";
 
-const variants = {
-  neutral: 'bg-surface-overlay text-fg-muted',
-  brand: 'bg-brand-soft text-brand-strong',
-  success: 'bg-success/15 text-success',
-  warning: 'bg-warning/15 text-warning',
-  danger: 'bg-danger/15 text-danger',
-} as const
+import { cn } from "@/lib/utils";
 
-export type BadgeVariant = keyof typeof variants
+const badgeVariants = cva(
+    "inline-flex w-fit shrink-0 items-center justify-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium whitespace-nowrap transition-colors [&>svg]:pointer-events-none [&>svg]:size-3",
+    {
+        variants: {
+            variant: {
+                default:
+                    "border-transparent bg-primary text-primary-foreground",
+                secondary: "border-transparent bg-muted text-muted-foreground",
+                outline: "border-border text-foreground",
+                glow: "border-primary/30 bg-primary/10 text-(--primary-bright) shadow-[0_0_20px_-4px_var(--glow-primary)]",
+                accent: "border-accent/30 bg-accent/10 text-accent-foreground dark:text-accent",
+                pink: "border-pink/30 bg-pink/10 text-pink",
+                success: "border-success/30 bg-success/10 text-success",
+                warning: "border-warning/30 bg-warning/10 text-warning",
+                destructive:
+                    "border-destructive/30 bg-destructive/10 text-destructive",
+                glass: "text-foreground glass",
+            },
+        },
+        defaultVariants: {
+            variant: "default",
+        },
+    },
+);
 
-export interface BadgeProps extends ComponentProps<'span'> {
-  variant?: BadgeVariant
-  /** Leading status dot in the badge color. */
-  dot?: boolean
-}
+type BadgeProps = React.ComponentProps<"span"> &
+    VariantProps<typeof badgeVariants> & {
+        /** Render as the passed child element instead of a `<span>`. */
+        asChild?: boolean;
+        /** Base UI render prop; overrides the default element. */
+        render?: useRender.RenderProp;
+    };
 
-export function Badge({
-  variant = 'neutral',
-  dot = false,
-  className,
-  children,
-  ...props
+function Badge({
+    className,
+    variant,
+    asChild = false,
+    render,
+    children,
+    ...props
 }: BadgeProps) {
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium',
-        variants[variant],
-        className,
-      )}
-      {...props}
-    >
-      {dot && <span className="size-1.5 rounded-full bg-current" aria-hidden />}
-      {children}
-    </span>
-  )
+    return useRender({
+        defaultTagName: "span",
+        render:
+            asChild && React.isValidElement(children)
+                ? (children as React.ReactElement<Record<string, unknown>>)
+                : render,
+        props: {
+            "data-slot": "badge",
+            className: cn(badgeVariants({ variant }), className),
+            ...(asChild ? {} : { children }),
+            ...props,
+        },
+    });
 }
+
+export { Badge, badgeVariants };

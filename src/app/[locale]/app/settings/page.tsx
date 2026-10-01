@@ -1,13 +1,13 @@
-import { useTranslations } from 'next-intl'
-import { PageHeader } from '@/components/layout/PageHeader'
+import { Settings } from "@/features/settings/settings";
+import { Page } from "@/features/shared/page";
+import { pageMetadata } from "@/lib/metadata";
+
+export const generateMetadata = pageMetadata("settings");
 
 export default function SettingsPage() {
-  const t = useTranslations()
-
-  return (
-    <>
-      <PageHeader title={t('pages.settings.title')} description={t('pages.settings.description')} />
-      <p className="text-sm text-fg-subtle">{t('common.comingSoon', { step: 7 })}</p>
-    </>
-  )
+    return (
+        <Page pageKey="settings">
+            <Settings />
+        </Page>
+    );
 }

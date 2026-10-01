@@ -44,3 +44,6 @@ next-env.d.ts
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# graphify knowledge graph (rebuild with `npm run graph:build`)
+graphify-out/

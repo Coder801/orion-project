@@ -4,3 +4,6 @@ node_modules
 package-lock.json
 CLAUDE.md
 AGENTS.md
+graphify-out
+.claude
+theme

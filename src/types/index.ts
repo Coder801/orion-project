@@ -1,13 +1,11 @@
-export type Theme = 'dark' | 'light'
-export type Language = 'ru' | 'en'
+import type { Role } from "@/domain/types";
 
-export type FiatCurrency = 'USD' | 'EUR' | 'GBP'
-export type CryptoCurrency = 'BTC' | 'ETH' | 'USDT' | 'SOL'
-export type Currency = FiatCurrency | CryptoCurrency
+export type Language = "en";
 
-export interface User {
-  id: string
-  name: string
-  email: string
-  baseCurrency: FiatCurrency
+/** What the session cookie carries; the full user lives in the repository. */
+export interface SessionUser {
+    id: string;
+    email: string;
+    name: string;
+    role: Role;
 }

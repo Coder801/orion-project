@@ -1,6 +1,6 @@
 # Agent notes
 
-Project spec and conventions: see CLAUDE.md.
+Project spec and conventions: see .claude/CLAUDE.md.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

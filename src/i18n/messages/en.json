@@ -1,311 +1,964 @@
 {
-  "meta": {
-    "description": "Orion — a next-generation banking dashboard demo: fiat and crypto in one place"
-  },
-  "common": {
-    "appName": "Orion Bank",
-    "loading": "Loading…",
-    "goHome": "Go to home page",
-    "goToApp": "Open dashboard",
-    "comingSoon": "This section arrives in step {step}.",
-    "close": "Close",
-    "cancel": "Cancel",
-    "confirm": "Confirm"
-  },
-  "nav": {
-    "dashboard": "Overview",
-    "accounts": "Accounts & wallets",
-    "transactions": "Transactions",
-    "transfer": "Transfer",
-    "settings": "Settings"
-  },
-  "layout": {
-    "skipToContent": "Skip to content",
-    "mainNavigation": "Main navigation",
-    "openMenu": "Open menu",
-    "closeMenu": "Close menu",
-    "logout": "Log out",
-    "guest": "Guest",
-    "logoLabel": "Orion Bank — home",
-    "switchToLight": "Switch to light theme",
-    "switchToDark": "Switch to dark theme",
-    "language": "Language"
-  },
-  "errors": {
-    "title": "Error",
-    "generic": "Something went wrong. Try reloading the page.",
-    "notFoundTitle": "Page not found",
-    "notFoundText": "This page does not exist or has been moved.",
-    "retry": "Try again"
-  },
-  "pages": {
-    "login": {
-      "title": "Sign in",
-      "placeholder": "The sign-in form arrives in step 5."
+    "meta": {
+        "description": "Orion Bank — demo multi-currency wallet (fiat and crypto)"
     },
-    "register": {
-      "title": "Create account",
-      "placeholder": "The sign-up form arrives in step 5."
+    "common": {
+        "appName": "Orion Bank",
+        "loading": "Loading…",
+        "goHome": "Go to home page",
+        "goToApp": "Open dashboard",
+        "close": "Close",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "deposit": "Deposit",
+        "withdraw": "Withdraw",
+        "transfer": "Transfer",
+        "convert": "Convert",
+        "verification": "Verification",
+        "credit": "Credit",
+        "cards": "Cards",
+        "accountDetails": "Account details",
+        "settings": "Settings",
+        "support": "Support",
+        "registrations": "Registrations",
+        "requests": "Requests",
+        "conversions": "Conversions",
+        "credits": "Credits",
+        "cardOrders": "Card orders",
+        "adminSettings": "Platform settings"
+    },
+    "layout": {
+        "skipToContent": "Skip to content",
+        "mainNavigation": "Main navigation",
+        "openMenu": "Open menu",
+        "closeMenu": "Close menu",
+        "logout": "Log out",
+        "guest": "Guest",
+        "logoLabel": "Orion Bank — home",
+        "switchToLight": "Switch to light theme",
+        "switchToDark": "Switch to dark theme",
+        "language": "Language",
+        "demoBanner": "Demo environment — mock data only, no real money moves",
+        "adminPanel": "Admin panel",
+        "navSections": {
+            "overview": "Overview",
+            "money": "Money",
+            "products": "Products",
+            "account": "Account",
+            "review": "Review",
+            "platform": "Platform"
+        },
+        "adminBadge": "Admin",
+        "accountMenu": "Account menu",
+        "settings": "Settings",
+        "toggleSidebar": "Collapse or expand sidebar",
+        "userArea": "Wallet",
+        "notificationsLabel": "Notifications, {count} unread",
+        "unread": "{count} new",
+        "backToHome": "Back to home"
+    },
+    "errors": {
+        "title": "Error",
+        "generic": "Something went wrong. Try reloading the page.",
+        "notFoundTitle": "Page not found",
+        "notFoundText": "This page does not exist or has been moved.",
+        "retry": "Try again"
+    },
+    "validation": {
+        "required": "Required field",
+        "email": "Enter a valid email",
+        "passwordMin": "At least 8 characters",
+        "passwordMismatch": "Passwords do not match",
+        "amountFormat": "Use digits and a dot, e.g. 10.50",
+        "amountPositive": "Amount must be greater than zero",
+        "amountDecimals": "Too many decimal places for this currency",
+        "insufficientFunds": "Exceeds the available balance (fee included)",
+        "holderName": "Enter the holder's full name",
+        "iban": "Invalid IBAN",
+        "bic": "Invalid BIC/SWIFT",
+        "accountNumber": "6–17 digits",
+        "routingNumber": "Invalid routing number",
+        "cardNumber": "Invalid card number",
+        "cardExpiry": "Use MM/YY, not expired",
+        "cryptoAddress": "Address does not match the selected network",
+        "txHash": "Invalid transaction hash",
+        "network": "Choose a network",
+        "birthDate": "You must be at least 18",
+        "fileRequired": "Attach at least one file",
+        "fileTooLarge": "File is larger than 5 MB",
+        "fileType": "Only PNG, JPEG or PDF",
+        "price": "Enter a positive number (up to 8 decimals)",
+        "bps": "Whole number from 0 to 10000",
+        "sameAccount": "Choose a different account",
+        "sameCurrency": "Choose a different currency"
+    },
+    "domainErrors": {
+        "notFound": "Not found",
+        "forbidden": "Not allowed",
+        "invalidCredentials": "No account with this email",
+        "emailTaken": "This email is already registered",
+        "kycRequired": "Complete verification first",
+        "kycAlreadySubmitted": "Verification is already submitted",
+        "insufficientFunds": "Insufficient available balance",
+        "invalidAmount": "Invalid amount",
+        "currencyDisabled": "Currency is not available",
+        "methodUnavailable": "Method is not available for this currency",
+        "currencyMismatch": "Account currency does not match",
+        "sameAccount": "Choose a different account",
+        "sameCurrency": "Choose a different currency",
+        "recipientNotFound": "Recipient not found",
+        "recipientSelf": "You cannot send to yourself",
+        "reasonRequired": "A reason is required",
+        "invariant": "Operation failed and was rolled back",
+        "unknown": "Something went wrong"
+    },
+    "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "completed": "Completed",
+        "failed": "Failed",
+        "none": "Not started",
+        "open": "Open",
+        "answered": "Answered",
+        "closed": "Closed"
+    },
+    "pages": {
+        "dashboard": {
+            "title": "Dashboard",
+            "description": "Balances, activity and notifications"
+        },
+        "deposit": {
+            "title": "Deposit",
+            "description": "Create a deposit request"
+        },
+        "withdraw": {
+            "title": "Withdraw",
+            "description": "Create a withdrawal request"
+        },
+        "transfer": {
+            "title": "Transfer",
+            "description": "Between your accounts or to another user"
+        },
+        "convert": {
+            "title": "Convert",
+            "description": "Exchange one currency for another"
+        },
+        "verification": {
+            "title": "Verification",
+            "description": "Identity verification (KYC)"
+        },
+        "credit": {
+            "title": "Credit",
+            "description": "Apply for credit and track applications"
+        },
+        "cards": {
+            "title": "Cards",
+            "description": "Order a card and track orders"
+        },
+        "accountDetails": {
+            "title": "Account details",
+            "description": "Identifiers for your accounts"
+        },
+        "settings": {
+            "title": "Settings",
+            "description": "Profile, password, language and theme"
+        },
+        "support": {
+            "title": "Support",
+            "description": "Contact support"
+        },
+        "registrations": {
+            "title": "Registrations",
+            "description": "Users and KYC review"
+        },
+        "requests": {
+            "title": "Requests",
+            "description": "Deposits, withdrawals and transfers queue"
+        },
+        "conversions": {
+            "title": "Conversions",
+            "description": "Conversion requests queue"
+        },
+        "credits": {
+            "title": "Credit applications",
+            "description": "Review credit applications"
+        },
+        "cardOrders": {
+            "title": "Card orders",
+            "description": "Review card orders"
+        },
+        "adminSettings": {
+            "title": "Platform settings",
+            "description": "Currencies, methods, rates and fees"
+        }
+    },
+    "kycGate": {
+        "title": "Verification required",
+        "description": {
+            "none": "Verify your identity to use {operation}.",
+            "pending": "Your verification is under review. {operation} will be available after approval.",
+            "approved": "Verification approved.",
+            "rejected": "Your verification was rejected. Submit it again to use {operation}."
+        },
+        "operations": {
+            "deposit": "deposits",
+            "withdraw": "withdrawals",
+            "transfer": "transfers",
+            "convert": "conversions",
+            "credit": "credit",
+            "cards": "cards"
+        },
+        "action": "Go to verification"
+    },
+    "auth": {
+        "signIn": {
+            "title": "Sign in",
+            "description": "Sign in to your account",
+            "noAccount": "No account yet?",
+            "submit": "Sign in"
+        },
+        "signUp": {
+            "title": "Create account",
+            "description": "Registration takes a minute",
+            "haveAccount": "Already have an account?",
+            "submit": "Create account"
+        },
+        "forgot": {
+            "title": "Reset password",
+            "description": "We will send reset instructions to your email",
+            "link": "Forgot password?",
+            "back": "Back to sign in",
+            "sent": "If this email is registered, instructions are on their way (demo: nothing is sent).",
+            "submit": "Send instructions"
+        },
+        "fields": {
+            "email": "Email",
+            "password": "Password",
+            "passwordHint": "At least 8 characters",
+            "name": "Full name",
+            "confirmPassword": "Confirm password",
+            "emailPlaceholder": "you@example.com",
+            "showPassword": "Show password",
+            "hidePassword": "Hide password"
+        },
+        "demoAccounts": {
+            "title": "Demo accounts",
+            "hint": "Any password of 8+ characters works.",
+            "user": "Verified user",
+            "newcomer": "Unverified user",
+            "pending": "KYC pending",
+            "admin": "Admin"
+        }
     },
     "dashboard": {
-      "title": "Overview",
-      "description": "A summary of your assets"
+        "balances": "Balances",
+        "noAccounts": "No accounts yet",
+        "onHold": "On hold",
+        "available": "Available",
+        "hold": "Hold",
+        "recentTransactions": "Recent transactions",
+        "noTransactions": "No transactions yet",
+        "notifications": "Notifications",
+        "markAllRead": "Mark all read",
+        "noNotifications": "No notifications"
     },
-    "accounts": {
-      "title": "Accounts & wallets",
-      "description": "Fiat accounts and crypto wallets"
+    "notifications": {
+        "message": "{subject}: {status}",
+        "reason": "Reason: {reason}",
+        "subjects": {
+            "deposit": "Deposit",
+            "withdrawal": "Withdrawal",
+            "transfer": "Transfer",
+            "conversion": "Conversion",
+            "kyc": "Verification",
+            "credit": "Credit application",
+            "cardOrder": "Card order"
+        }
     },
     "transactions": {
-      "title": "Transactions",
-      "description": "Your transaction history"
+        "date": "Date",
+        "type": "Type",
+        "status": "Status",
+        "amount": "Amount",
+        "types": {
+            "deposit": "Deposit",
+            "withdrawal": "Withdrawal",
+            "transfer": "Transfer",
+            "conversion": "Conversion"
+        }
+    },
+    "payments": {
+        "created": "Request created and sent for review",
+        "account": "Account",
+        "chooseAccount": "Choose account",
+        "method": "Method",
+        "chooseMethod": "Choose method",
+        "details": "Method details",
+        "chooseNetwork": "Choose network",
+        "optional": "{label} (optional)",
+        "amount": "Amount",
+        "availableHint": "Available: {amount}",
+        "fee": "Fee",
+        "totalDebit": "Total debit",
+        "reviewNotice": "Balances change only after an administrator approves the request.",
+        "submitDeposit": "Create deposit request",
+        "submitWithdrawal": "Create withdrawal request"
+    },
+    "methods": {
+        "sepa-in": "Bank transfer (EUR)",
+        "wire-in": "Wire transfer",
+        "card-in": "Card",
+        "crypto-in": "Crypto deposit",
+        "sepa-out": "Bank transfer (EUR)",
+        "wire-out": "Wire transfer",
+        "card-out": "Card payout",
+        "crypto-out": "Crypto withdrawal"
+    },
+    "methodFields": {
+        "holderName": "Holder name",
+        "iban": "IBAN",
+        "bic": "BIC / SWIFT",
+        "accountNumber": "Account number",
+        "routingNumber": "Routing number",
+        "cardNumber": "Card number",
+        "cardExpiry": "Expiry (MM/YY)",
+        "network": "Network",
+        "txHash": "Transaction hash",
+        "reference": "Reference",
+        "address": "Wallet address"
+    },
+    "networks": {
+        "bitcoin": "Bitcoin",
+        "ethereum": "Ethereum",
+        "tron": "Tron",
+        "solana": "Solana"
+    },
+    "requests": {
+        "mine": "My requests",
+        "empty": "No requests yet",
+        "date": "Date",
+        "kind": "Type",
+        "amount": "Amount",
+        "status": "Status",
+        "reason": "Reason",
+        "kinds": {
+            "deposit": "Deposit",
+            "withdrawal": "Withdrawal",
+            "transfer": "Transfer",
+            "conversion": "Conversion"
+        }
     },
     "transfer": {
-      "title": "Transfer",
-      "description": "Send money"
+        "created": "Transfer request created",
+        "from": "From account",
+        "chooseAccount": "Choose account",
+        "to": "Recipient",
+        "targets": {
+            "own": "My account",
+            "user": "Another user"
+        },
+        "toAccount": "To account",
+        "noOwnTargets": "You have no other account in this currency",
+        "recipientEmail": "Recipient email",
+        "recipientHint": "The recipient must be registered",
+        "amount": "Amount",
+        "reviewNotice": "Funds are held until an administrator reviews the transfer.",
+        "submit": "Create transfer"
     },
-    "settings": {
-      "title": "Settings",
-      "description": "Profile, appearance and security"
-    }
-  },
-  "uiKit": {
-    "title": "UI kit",
-    "description": "Building blocks of the Orion interface",
-    "sections": {
-      "buttons": "Buttons",
-      "badges": "Badges",
-      "forms": "Form fields",
-      "switches": "Switches",
-      "cards": "Cards",
-      "table": "Table",
-      "modal": "Modal",
-      "states": "Loading, empty and error states"
+    "convert": {
+        "created": "Conversion request created",
+        "from": "From account",
+        "chooseAccount": "Choose account",
+        "amount": "Amount",
+        "to": "To currency",
+        "chooseCurrency": "Choose currency",
+        "quote": "Quote",
+        "quoteHint": "Choose an account, a target currency and an amount to see the quote.",
+        "rate": "Rate",
+        "fee": "Fee",
+        "totalDebit": "Total debit",
+        "youGet": "You get",
+        "reviewNotice": "The quoted rate is locked when the request is created.",
+        "submit": "Create conversion"
     },
-    "buttons": {
-      "primary": "Primary",
-      "secondary": "Secondary",
-      "outline": "Outline",
-      "ghost": "Ghost",
-      "danger": "Delete",
-      "small": "Small",
-      "large": "Large",
-      "loading": "Saving",
-      "disabled": "Disabled",
-      "withIcon": "Send money",
-      "asLink": "Link styled as button",
-      "iconLabel": "Add account"
+    "verification": {
+        "statusTitle": "Verification status",
+        "statusText": {
+            "none": "You have not submitted verification yet.",
+            "pending": "Your documents are under review.",
+            "approved": "Your identity is verified. All operations are available.",
+            "rejected": "Verification was rejected. You can submit it again."
+        },
+        "rejectionReason": "Reason: {reason}",
+        "submittedAt": "Submitted {date}",
+        "formTitle": "Verification form",
+        "stepsLabel": "Progress",
+        "stepN": "Step {n}",
+        "steps": {
+            "personal": "Personal data",
+            "address": "Address",
+            "document": "Document"
+        },
+        "fields": {
+            "firstName": "First name",
+            "lastName": "Last name",
+            "birthDate": "Date of birth",
+            "country": "Country",
+            "choose": "Choose…",
+            "line1": "Address",
+            "city": "City",
+            "postalCode": "Postal code",
+            "documentType": "Document type",
+            "documentNumber": "Document number",
+            "files": "Document files",
+            "filesHint": "PNG, JPEG or PDF, up to 5 MB, max 3 files. Stored in memory only."
+        },
+        "countries": {
+            "DE": "Country A",
+            "FR": "Country B",
+            "ES": "Country C",
+            "IT": "Country D",
+            "NL": "Country E",
+            "GB": "Country F",
+            "US": "Country G",
+            "OTHER": "Other"
+        },
+        "documentTypes": {
+            "passport": "Passport",
+            "idCard": "ID card",
+            "driverLicense": "Driver's license"
+        },
+        "back": "Back",
+        "next": "Next",
+        "submit": "Submit for review"
     },
-    "badges": {
-      "neutral": "Draft",
-      "brand": "New",
-      "success": "Completed",
-      "warning": "Pending",
-      "danger": "Failed"
-    },
-    "forms": {
-      "emailLabel": "Email",
-      "emailPlaceholder": "you@example.com",
-      "emailHint": "We use it only for sign-in.",
-      "amountLabel": "Amount",
-      "amountError": "Amount exceeds the available balance",
-      "currencyLabel": "Currency",
-      "currencyPlaceholder": "Choose currency",
-      "searchLabel": "Search",
-      "searchPlaceholder": "Search transactions",
-      "disabledLabel": "Account number"
-    },
-    "switches": {
-      "twoFactor": "Two-factor authentication",
-      "twoFactorHint": "Ask for a code on every sign-in",
-      "notifications": "Email notifications"
+    "credit": {
+        "formTitle": "Credit application",
+        "created": "Application submitted",
+        "fields": {
+            "currency": "Currency",
+            "choose": "Choose…",
+            "amount": "Amount",
+            "term": "Term",
+            "purpose": "Purpose",
+            "income": "Monthly income",
+            "date": "Date",
+            "status": "Status",
+            "reason": "Reason"
+        },
+        "months": "{count, plural, one {# month} other {# months}}",
+        "purposes": {
+            "personal": "Personal",
+            "education": "Education",
+            "business": "Business",
+            "other": "Other"
+        },
+        "submit": "Apply",
+        "listTitle": "My applications",
+        "empty": "No applications yet"
     },
     "cards": {
-      "balanceTitle": "Total balance",
-      "balanceDescription": "Across all accounts",
-      "change": "{value} this month",
-      "actionsTitle": "Quick actions",
-      "actionsDescription": "Most frequent operations",
-      "topUp": "Top up",
-      "withdraw": "Withdraw"
+        "formTitle": "Order a card",
+        "created": "Card order created",
+        "fields": {
+            "type": "Card type",
+            "tier": "Tier",
+            "account": "Linked account",
+            "choose": "Choose…",
+            "deliveryAddress": "Delivery address",
+            "date": "Date",
+            "status": "Status"
+        },
+        "types": {
+            "virtual": "Virtual",
+            "physical": "Physical"
+        },
+        "tiers": {
+            "standard": {
+                "name": "Tier 1",
+                "text": "Tier description placeholder"
+            },
+            "premium": {
+                "name": "Tier 2",
+                "text": "Tier description placeholder"
+            }
+        },
+        "submit": "Order card",
+        "listTitle": "My card orders",
+        "empty": "No card orders yet"
     },
-    "table": {
-      "caption": "Recent activity",
-      "date": "Date",
-      "description": "Description",
-      "status": "Status",
-      "amount": "Amount",
-      "rows": {
-        "coffee": "Coffee shop",
-        "salary": "Salary",
-        "btc": "BTC purchase",
-        "refund": "Card refund"
-      }
+    "support": {
+        "formTitle": "New ticket",
+        "created": "Ticket created",
+        "fields": {
+            "subject": "Subject",
+            "category": "Category",
+            "choose": "Choose…",
+            "message": "Message"
+        },
+        "categories": {
+            "account": "Account",
+            "payments": "Payments",
+            "verification": "Verification",
+            "other": "Other"
+        },
+        "submit": "Send",
+        "listTitle": "My tickets",
+        "empty": "No tickets yet"
     },
-    "modal": {
-      "open": "Open dialog",
-      "title": "Confirm transfer",
-      "description": "Check the details before sending.",
-      "recipientLabel": "Recipient",
-      "amountLabel": "Amount",
-      "feeLabel": "Fee",
-      "recipient": "Alex Morgan"
+    "accountDetails": {
+        "title": "Account details",
+        "disclaimer": "Identifiers below are generated placeholders for the demo. They are not real bank or wallet details.",
+        "empty": "No accounts yet",
+        "fiat": "Fiat account",
+        "crypto": "Crypto wallet",
+        "holder": "Holder",
+        "accountNumber": "Account number",
+        "routingCode": "Routing code",
+        "walletAddress": "Deposit address",
+        "currency": "Currency",
+        "copy": "Copy {label}",
+        "copied": "Copied"
     },
-    "states": {
-      "skeleton": "Skeleton",
-      "empty": "Empty",
-      "error": "Error",
-      "emptyTitle": "No transactions yet",
-      "emptyDescription": "Your activity will appear here.",
-      "emptyAction": "Make a transfer",
-      "errorDescription": "We couldn't load your transactions.",
-      "loadingLabel": "Loading transactions"
+    "settings": {
+        "save": "Save",
+        "saved": "Saved",
+        "profile": {
+            "title": "Profile",
+            "description": "Your personal data",
+            "name": "Full name",
+            "email": "Email"
+        },
+        "password": {
+            "title": "Password",
+            "description": "Demo: the new password is validated but not stored",
+            "changed": "Password changed",
+            "current": "Current password",
+            "new": "New password",
+            "confirm": "Confirm new password",
+            "submit": "Change password"
+        },
+        "preferences": {
+            "title": "Preferences",
+            "language": "Language",
+            "darkTheme": "Dark theme",
+            "darkThemeHint": "Use the dark color scheme"
+        }
+    },
+    "admin": {
+        "review": {
+            "approve": "Approve",
+            "reject": "Reject",
+            "approveTitle": "Approve request",
+            "rejectTitle": "Reject request",
+            "approveDescription": "Check the details before approving.",
+            "rejectDescription": "The user will see the reason.",
+            "cancel": "Cancel",
+            "reason": "Reason",
+            "reasonOptional": "Comment (optional)"
+        },
+        "requests": {
+            "user": "User",
+            "rate": "Rate",
+            "fee": "Fee",
+            "target": "Recipient",
+            "ownAccount": "Own account",
+            "method": "Method",
+            "all": "All",
+            "filters": {
+                "status": "Status",
+                "type": "Type",
+                "currency": "Currency"
+            },
+            "loading": "Loading requests",
+            "empty": "No requests match the filters",
+            "actions": "Actions"
+        },
+        "registrations": {
+            "views": "Views",
+            "users": "Users",
+            "noUsers": "No users",
+            "email": "Email",
+            "name": "Name",
+            "role": "Role",
+            "kycStatus": "KYC",
+            "registered": "Registered",
+            "roles": {
+                "user": "User",
+                "admin": "Admin"
+            },
+            "kyc": "KYC review",
+            "noKyc": "No submissions",
+            "submitted": "Submitted",
+            "actions": "Actions"
+        },
+        "credits": {
+            "title": "Credit applications"
+        },
+        "cardOrders": {
+            "title": "Card orders"
+        },
+        "settings": {
+            "currencies": "Currencies & rates",
+            "currenciesHint": "Enable currencies and edit placeholder prices in USD.",
+            "types": {
+                "fiat": "Fiat",
+                "crypto": "Crypto"
+            },
+            "priceFor": "Price of {code} in USD",
+            "methods": "Methods",
+            "methodsHint": "Enable or disable deposit and withdrawal methods.",
+            "kinds": {
+                "deposit": "Deposit",
+                "withdrawal": "Withdrawal"
+            },
+            "fees": "Fees",
+            "feesHint": "In basis points: 100 bps = 1%.",
+            "feeLabels": {
+                "conversionBps": "Conversion",
+                "withdrawalBps": "Withdrawal",
+                "transferBps": "Transfer"
+            },
+            "bps": "bps",
+            "save": "Save settings",
+            "saved": "Settings saved",
+            "resetTitle": "Reset demo data",
+            "demoOnly": "Demo",
+            "resetHint": "Restores the seed users, balances and requests.",
+            "reset": "Reset",
+            "resetConfirm": "All changes made in this browser will be lost.",
+            "cancel": "Cancel"
+        }
+    },
+    "uiKit": {
+        "title": "UI kit",
+        "description": "Building blocks of the Orion interface",
+        "sections": {
+            "buttons": "Buttons",
+            "badges": "Badges",
+            "forms": "Form fields",
+            "switches": "Switches",
+            "cards": "Cards",
+            "table": "Table",
+            "modal": "Modal",
+            "states": "Loading, empty and error states"
+        },
+        "buttons": {
+            "primary": "Primary",
+            "secondary": "Secondary",
+            "outline": "Outline",
+            "ghost": "Ghost",
+            "danger": "Delete",
+            "small": "Small",
+            "large": "Large",
+            "loading": "Saving",
+            "disabled": "Disabled",
+            "withIcon": "Send money",
+            "asLink": "Link styled as button",
+            "iconLabel": "Add account"
+        },
+        "badges": {
+            "neutral": "Draft",
+            "brand": "New",
+            "success": "Completed",
+            "warning": "Pending",
+            "danger": "Failed"
+        },
+        "forms": {
+            "emailLabel": "Email",
+            "emailPlaceholder": "you@example.com",
+            "emailHint": "We use it only for sign-in.",
+            "amountLabel": "Amount",
+            "amountError": "Amount exceeds the available balance",
+            "currencyLabel": "Currency",
+            "currencyPlaceholder": "Choose currency",
+            "searchLabel": "Search",
+            "searchPlaceholder": "Search transactions",
+            "disabledLabel": "Account number"
+        },
+        "switches": {
+            "twoFactor": "Two-factor authentication",
+            "twoFactorHint": "Ask for a code on every sign-in",
+            "notifications": "Email notifications"
+        },
+        "cards": {
+            "balanceTitle": "Total balance",
+            "balanceDescription": "Across all accounts",
+            "change": "{value} this month",
+            "actionsTitle": "Quick actions",
+            "actionsDescription": "Most frequent operations",
+            "topUp": "Top up",
+            "withdraw": "Withdraw"
+        },
+        "table": {
+            "caption": "Recent activity",
+            "date": "Date",
+            "description": "Description",
+            "status": "Status",
+            "amount": "Amount",
+            "rows": {
+                "coffee": "Coffee shop",
+                "salary": "Salary",
+                "btc": "BTC purchase",
+                "refund": "Card refund"
+            }
+        },
+        "modal": {
+            "open": "Open dialog",
+            "title": "Confirm transfer",
+            "description": "Check the details before sending.",
+            "recipientLabel": "Recipient",
+            "amountLabel": "Amount",
+            "feeLabel": "Fee",
+            "recipient": "Alex Morgan"
+        },
+        "states": {
+            "skeleton": "Skeleton",
+            "empty": "Empty",
+            "error": "Error",
+            "emptyTitle": "No transactions yet",
+            "emptyDescription": "Your activity will appear here.",
+            "emptyAction": "Make a transfer",
+            "errorDescription": "We couldn't load your transactions.",
+            "loadingLabel": "Loading transactions"
+        }
+    },
+    "landing": {
+        "nav": {
+            "label": "Sections",
+            "about": "About",
+            "services": "Services",
+            "partners": "Partners",
+            "license": "License",
+            "support": "Support",
+            "contact": "Contact us",
+            "login": "Log in",
+            "openAccount": "Sign up"
+        },
+        "hero": {
+            "eyebrow": "New Generation Banking Platform",
+            "title": "Your money.",
+            "subtitle": "Every currency.",
+            "text": "Orion Bank is a demo multi-currency wallet for fiat and crypto. It is a fictional product, not a real bank or financial service.",
+            "primaryCta": "Open Account Free",
+            "secondaryCta": "Contact Us",
+            "stats": {
+                "countries": "Countries Supported",
+                "assets": "Assets Under Management",
+                "uptime": "System Uptime"
+            }
+        },
+        "about": {
+            "title": "About Orion <gradient>Bank</gradient>",
+            "subtitle": "One account, multiple currencies",
+            "text": "A universal web application for secure transfers and asset exchange.",
+            "tabs": {
+                "convenience": {
+                    "label": "Convenience",
+                    "title": "Banking without limits",
+                    "text": "Open up to three cards of every currency type to meet your needs and preferences. Apply for credit, make transfers and withdraw cryptocurrency — all in one bank. Our multifunctional cards and wide range of financial services let you manage your funds easily and effectively."
+                },
+                "cryptoTopUp": {
+                    "label": "Crypto Top-Up",
+                    "title": "Seamless crypto integration",
+                    "text": "Fund your fiat accounts with cryptocurrency instantly. Our platform supports BTC, ETH, USDT, USDC, and XDUSDT — with automatic conversion at live market rates. No middlemen, no delays."
+                },
+                "accessibility": {
+                    "label": "Accessibility",
+                    "title": "Available 24/7, anywhere",
+                    "text": "Access your accounts from any device, at any time, from any country. Our platform is fully optimised for mobile and desktop with enterprise-grade availability guarantees."
+                }
+            },
+            "cta": "Register now"
+        },
+        "services": {
+            "title": "Services",
+            "subtitle": "Everything in one platform",
+            "text": "Built for individuals and businesses who demand more from their bank.",
+            "items": {
+                "multiCurrency": {
+                    "title": "Multi-Currency Accounts",
+                    "text": "Hold EUR, USD, GBP, CHF and manage BTC, ETH, USDT, USDC, XDUSDT — all in one secure account."
+                },
+                "instantTransfers": {
+                    "title": "Instant Transfers",
+                    "text": "SEPA, Wire, and crypto transfers processed in real-time with live status tracking."
+                },
+                "security": {
+                    "title": "Bank-Grade Security",
+                    "text": "Military-grade encryption, multi-factor authentication, and full KYC/AML compliance."
+                },
+                "cards": {
+                    "title": "Virtual & Physical Cards",
+                    "text": "Instantly issued virtual Visa card plus a premium metal physical card delivered worldwide."
+                },
+                "liveRates": {
+                    "title": "Live Crypto Rates",
+                    "text": "Real-time cryptocurrency prices updated every minute across all your portfolio assets."
+                },
+                "compliance": {
+                    "title": "Full Compliance",
+                    "text": "Operating under strict European regulatory standards with verified KYC procedures."
+                }
+            }
+        },
+        "partners": {
+            "eyebrow": "Partners",
+            "title": "Partners",
+            "subtitle": "Orion Bank operates in partnership with leading European and American financial institutions, ensuring the highest level of reliability and liquidity.",
+            "items": {
+                "northgate": {
+                    "name": "Northgate Bank",
+                    "country": "United Kingdom"
+                },
+                "alderBay": {
+                    "name": "Alder Bay Financial",
+                    "country": "United States"
+                },
+                "halvorsen": {
+                    "name": "Halvorsen Bank",
+                    "country": "Norway"
+                },
+                "lumenTrust": {
+                    "name": "Lumen Trust",
+                    "country": "Switzerland"
+                },
+                "crestline": {
+                    "name": "Crestline Savings",
+                    "country": "Canada"
+                },
+                "veridia": {
+                    "name": "Veridia Banca",
+                    "country": "Italy"
+                },
+                "brightwater": {
+                    "name": "Brightwater Capital",
+                    "country": "United States"
+                },
+                "rhineMeridian": {
+                    "name": "Rhine Meridian Bank",
+                    "country": "Germany"
+                },
+                "summitRidge": {
+                    "name": "Summit Ridge Bank",
+                    "country": "United States"
+                },
+                "solent": {
+                    "name": "Solent Mutual",
+                    "country": "Ireland"
+                },
+                "cascadia": {
+                    "name": "Cascadia Federal",
+                    "country": "United States"
+                },
+                "aurelius": {
+                    "name": "Aurelius Banque",
+                    "country": "France"
+                }
+            }
+        },
+        "license": {
+            "eyebrow": "Licenses",
+            "title": "License & Regulation",
+            "subtitle": "Orion Bank operates under strict regulatory oversight, ensuring the safety and security of your assets.",
+            "items": {
+                "banking": {
+                    "title": "Banking License",
+                    "text": "Operating license information will be published here shortly. We are committed to full regulatory transparency."
+                },
+                "amlKyc": {
+                    "title": "AML/KYC Compliance",
+                    "text": "Full Anti-Money Laundering and Know Your Customer procedures are in place, verified by independent auditors."
+                },
+                "clientProtection": {
+                    "title": "Client Protection",
+                    "text": "Client funds are held in segregated accounts at partner institutions, ensuring full protection of your assets."
+                }
+            },
+            "states": {
+                "active": "Active",
+                "inProgress": "In progress",
+                "planned": "Planned"
+            },
+            "disclaimer": "Demo only: Orion Bank holds no licences and is not regulated by any authority."
+        },
+        "support": {
+            "title": "Support",
+            "subtitle": "Contact our support team for assistance with your account or transactions.",
+            "channels": {
+                "chat": {
+                    "title": "Live chat",
+                    "text": "Chat channel description placeholder."
+                },
+                "email": {
+                    "title": "Email",
+                    "text": "Email channel description placeholder."
+                },
+                "help": {
+                    "title": "Help center",
+                    "text": "Help center description placeholder."
+                }
+            },
+            "faqTitle": "Frequently asked questions",
+            "faq": {
+                "currencies": {
+                    "question": "What currencies are supported?",
+                    "answer": "We support EUR, USD, GBP, and CHF for fiat accounts, as well as BTC, ETH, USDT, USDC, and XDUSDT for crypto accounts."
+                },
+                "kyc": {
+                    "question": "How long does KYC verification take?",
+                    "answer": "Our team reviews submitted documents within 1–3 business days. You will be notified once the process is complete."
+                },
+                "insurance": {
+                    "question": "Are my funds insured?",
+                    "answer": "This is a demo environment and no real funds are held. Please contact our support team for details on deposit protection."
+                },
+                "transfers": {
+                    "question": "What transfer methods are available?",
+                    "answer": "We support SEPA (EU/EEA), international Wire transfers, crypto wallet transfers, and direct card-to-card transfers."
+                },
+                "card": {
+                    "question": "How do I order a physical card?",
+                    "answer": "Log in to your account, navigate to the dashboard, and click \"Order Physical Card\". A one-time fee of 50 USDT applies. Delivery takes 14 business days."
+                }
+            }
+        },
+        "contact": {
+            "eyebrow": "Contact us",
+            "title": "Contact title",
+            "fields": {
+                "name": "Name",
+                "email": "Email",
+                "topic": "Topic",
+                "message": "Message",
+                "choose": "Choose a topic"
+            },
+            "topics": {
+                "general": "General question",
+                "account": "Account",
+                "partnership": "Partnership"
+            },
+            "submit": "Send message",
+            "sent": "Message sent (demo — nothing leaves your browser).",
+            "info": {
+                "emailLabel": "Email",
+                "emailValue": "support@orionbank.com",
+                "hoursLabel": "Hours",
+                "hoursValue": "24/7",
+                "addressLabel": "Address",
+                "addressValue": "Toronto, Canada"
+            }
+        },
+        "footer": {
+            "tagline": "A new generation banking platform for fiat and cryptocurrency asset management.",
+            "product": "Sections",
+            "account": "Account",
+            "disclaimer": "Orion Bank is a fictional demo. It does not provide financial services, process payments or store personal data.",
+            "rights": "© {year} Orion Bank demo"
+        }
     }
-  },
-  "landing": {
-    "nav": {
-      "label": "Sections",
-      "features": "Features",
-      "assets": "Fiat & crypto",
-      "pricing": "Pricing",
-      "faq": "FAQ",
-      "login": "Log in",
-      "openAccount": "Open account"
-    },
-    "hero": {
-      "eyebrow": "Fiat and crypto in one account",
-      "title": "Banking that keeps up with your money",
-      "subtitle": "Hold euros, dollars and crypto side by side, send money in seconds and see every movement in one clean dashboard.",
-      "primaryCta": "Open an account",
-      "secondaryCta": "Log in",
-      "points": {
-        "fast": "Open in minutes",
-        "fees": "Transparent fees",
-        "support": "Support 24/7"
-      }
-    },
-    "preview": {
-      "label": "Dashboard preview",
-      "totalBalance": "Total balance",
-      "thisMonth": "{value} this month",
-      "accounts": {
-        "eur": "Euro account",
-        "usd": "Dollar account",
-        "btc": "Bitcoin wallet",
-        "eth": "Ethereum wallet"
-      }
-    },
-    "features": {
-      "title": "Everything you need for your money",
-      "subtitle": "The essentials of a modern account, designed to stay out of your way.",
-      "items": {
-        "transfers": {
-          "title": "Instant transfers",
-          "text": "Send money to anyone in seconds and see the fee before you confirm."
-        },
-        "security": {
-          "title": "Security by default",
-          "text": "Two-factor authentication and session control are built into every account."
-        },
-        "multicurrency": {
-          "title": "Many currencies",
-          "text": "Keep EUR, USD and GBP accounts and exchange between them at a clear rate."
-        },
-        "analytics": {
-          "title": "Clear analytics",
-          "text": "Track your balance over time and filter every transaction in a couple of clicks."
-        }
-      }
-    },
-    "assets": {
-      "eyebrow": "One place",
-      "title": "Fiat and crypto in one place",
-      "text": "No more juggling apps. Your bank accounts and crypto wallets live side by side, with one total balance and one history.",
-      "points": {
-        "balance": "One total balance in your base currency",
-        "exchange": "Exchange between fiat and crypto in two taps",
-        "history": "A single history for every account and wallet"
-      },
-      "cta": "Get started",
-      "exchange": {
-        "label": "Exchange",
-        "from": "You pay",
-        "to": "You get",
-        "rate": "1 BTC ≈ {rate}",
-        "fee": "Fee {fee}"
-      }
-    },
-    "pricing": {
-      "title": "Simple plans",
-      "subtitle": "Start free and upgrade when you need more.",
-      "perMonth": "per month",
-      "popular": "Popular",
-      "choose": "Choose {plan}",
-      "plans": {
-        "start": {
-          "name": "Start",
-          "description": "For everyday spending",
-          "features": {
-            "f1": "2 currency accounts",
-            "f2": "Free transfers between Orion users",
-            "f3": "BTC and ETH wallets"
-          }
-        },
-        "plus": {
-          "name": "Plus",
-          "description": "For travel and saving",
-          "features": {
-            "f1": "5 currency accounts",
-            "f2": "Lower exchange fees",
-            "f3": "All supported crypto assets"
-          }
-        },
-        "pro": {
-          "name": "Pro",
-          "description": "For freelancers and power users",
-          "features": {
-            "f1": "Unlimited accounts",
-            "f2": "Priority support",
-            "f3": "Advanced analytics and exports"
-          }
-        }
-      }
-    },
-    "faq": {
-      "title": "Frequently asked questions",
-      "items": {
-        "demo": {
-          "question": "Is Orion a real bank?",
-          "answer": "No. Orion is a demo project: balances, transactions and rates are simulated, and no real money moves."
-        },
-        "open": {
-          "question": "How do I open an account?",
-          "answer": "Click “Open an account”, enter any valid email and a password of at least 8 characters — the demo signs you in instantly."
-        },
-        "crypto": {
-          "question": "Which crypto assets are supported?",
-          "answer": "The demo includes Bitcoin, Ethereum, Tether and Solana wallets alongside euro, dollar and pound accounts."
-        },
-        "security": {
-          "question": "How is my account protected?",
-          "answer": "Settings include two-factor authentication and active session management. In the demo these controls are placeholders."
-        },
-        "fees": {
-          "question": "Are there any fees?",
-          "answer": "Every transfer shows its fee before you confirm. Fees are calculated by the demo for illustration only."
-        }
-      }
-    },
-    "cta": {
-      "title": "Ready to try Orion?",
-      "text": "Open a demo account in under a minute — no documents needed.",
-      "button": "Open an account"
-    },
-    "footer": {
-      "tagline": "Next-generation banking demo: fiat and crypto in one account.",
-      "product": "Product",
-      "account": "Account",
-      "disclaimer": "Orion Bank is a fictional demo. It does not provide financial services, process payments or store personal data.",
-      "rights": "© {year} Orion Bank demo"
-    }
-  }
 }
