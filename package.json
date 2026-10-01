@@ -6,14 +6,15 @@
         "dev": "next dev -p 4000",
         "build": "next build",
         "start": "next start",
-        "lint": "eslint",
+        "lint": "eslint && npm run lint:case",
         "format": "prettier --write .",
         "cb": "npm run format && npm run lint && npm run build",
         "typecheck": "tsc --noEmit",
         "test": "vitest run",
         "test:watch": "vitest",
         "graph:build": "graphify extract . --code-only",
-        "graph:update": "graphify update ."
+        "graph:update": "graphify update .",
+        "lint:case": "node scripts/check-file-case.mjs"
     },
     "dependencies": {
         "@base-ui/react": "^1.6.0",

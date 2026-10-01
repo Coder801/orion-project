@@ -11,7 +11,6 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import type { LandingSection } from "@/config/landing";
 import { useEnterTimeline } from "@/features/landing/motion";
 import { SectionFrame } from "@/features/landing/section-frame";
