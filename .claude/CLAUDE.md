@@ -62,7 +62,7 @@ src/
 
 ## Routes & Logic
 
-- `/[locale]` — **Landing**: sections rendered from `config/landing.ts` (Hero, About, Services, Partners, License, Support, Contact us, Footer), one component per section in `features/landing/sections/`, each at least `min-h-svh` with ScrollTrigger effects (Services is a 3×2 card grid, License cards stack); sections marked `data-snap` get proximity snapping (`lenis/snap` in `SmoothScroll`, CSS scroll-snap when Lenis is off); header links scroll to anchors; the contact form goes through the mock `sendContactMessage` mutation (nothing is sent).
+- `/[locale]` — **Landing**: sections rendered from `config/landing.ts` (Hero, About, Services, Partners, License, Support, Contact us, Footer), one component per section in `features/landing/sections/`, each at least `min-h-svh` on desktop (`lg`+; on mobile content-height with a `SectionDivider` between them) with ScrollTrigger effects (desktop only) (Services is a 3×2 card grid, License cards stack); sections marked `data-snap` get proximity snapping (`lenis/snap` in `SmoothScroll`, CSS scroll-snap when Lenis is off); header links scroll to anchors; the contact form goes through the mock `sendContactMessage` mutation (nothing is sent).
 - `/[locale]/auth/sign-in | sign-up | forgot-password` — mock auth; sign-in accepts any registered email + any password of 8+ chars (demo accounts listed on the page).
 - `/[locale]/app/*` — `dashboard`, `deposit`, `withdraw`, `transfer`, `convert`, `verification`, `credit`, `cards`, `account-details`, `settings`, `support`.
 - `/[locale]/admin/*` — `registrations` (users + KYC review), `requests`, `conversions`, `credits`, `card-orders`, `settings` (currencies, methods, rates, fees, reset demo data).

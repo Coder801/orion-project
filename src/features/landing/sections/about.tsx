@@ -89,9 +89,13 @@ export function About({ tabs }: AboutProps) {
                     defaultValue={tabs[0]?.key}
                     className="mt-10 w-full max-w-3xl items-center gap-8"
                 >
-                    <TabsList className="max-w-full overflow-x-auto">
+                    <TabsList className="w-full overflow-x-auto">
                         {tabs.map(({ key, icon: Icon }) => (
-                            <TabsTrigger key={key} value={key}>
+                            <TabsTrigger
+                                key={key}
+                                value={key}
+                                className="max-sm:text-[12px]"
+                            >
                                 <Icon aria-hidden className="max-sm:hidden" />
                                 {t(`tabs.${key}.label`)}
                             </TabsTrigger>

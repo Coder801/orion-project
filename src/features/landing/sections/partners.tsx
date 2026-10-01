@@ -1,9 +1,10 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useRef } from "react";
+import { useId, useRef, useState } from "react";
 
 import { SectionHeading } from "@/components/site/section-heading";
+import { Button } from "@/components/ui/button";
 import type { PartnerKey, PartnerTone } from "@/config/landing";
 import { useEnterTimeline } from "@/features/landing/motion";
 import { SectionFrame } from "@/features/landing/section-frame";
@@ -40,10 +41,16 @@ const ROWS = [
     { from: 0, to: -20 },
 ];
 
+// Mobile shows a plain list instead of the marquee, collapsed to this many.
+const MOBILE_VISIBLE = 5;
+
 export function Partners({ items }: { items: PartnerItem[] }) {
     const t = useTranslations("landing.partners");
     const scope = useRef<HTMLElement>(null);
     const rowOffset = Math.ceil(items.length / ROWS.length);
+    const [expanded, setExpanded] = useState(false);
+    const listId = useId();
+    const mobileItems = expanded ? items : items.slice(0, MOBILE_VISIBLE);
 
     useEnterTimeline(scope, (tl) => {
         tl.from(
@@ -91,9 +98,26 @@ export function Partners({ items }: { items: PartnerItem[] }) {
                     className="mb-10 lg:mb-14"
                 />
             </div>
+            <div className="container-wide lg:hidden">
+                <ul id={listId} className="flex flex-col gap-3">
+                    {mobileItems.map(({ key, tone }) => (
+                        <PartnerCard key={key} partner={key} tone={tone} />
+                    ))}
+                </ul>
+                {!expanded && items.length > MOBILE_VISIBLE ? (
+                    <Button
+                        variant="outline"
+                        className="mt-6 w-full"
+                        aria-controls={listId}
+                        onClick={() => setExpanded(true)}
+                    >
+                        {t("showMore")}
+                    </Button>
+                ) : null}
+            </div>
             <div
                 data-partner-rows
-                className="space-y-5 overflow-x-clip mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]"
+                className="hidden space-y-5 overflow-x-clip mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] lg:block"
             >
                 {ROWS.map((_, rowIndex) => {
                     const row = rotate(items, rowIndex * rowOffset);
@@ -103,40 +127,63 @@ export function Partners({ items }: { items: PartnerItem[] }) {
                             data-partner-row
                             className="flex w-max gap-5"
                         >
-                            {[...row, ...row].map(({ key, tone }, i) => {
-                                const name = t(`items.${key}.name`);
-                                // The second copy only fills the marquee width.
-                                const duplicate = i >= row.length;
-                                return (
-                                    <li
-                                        key={`${key}-${i}`}
-                                        aria-hidden={duplicate || undefined}
-                                        className="flex h-20 w-64 shrink-0 items-center gap-4 rounded-2xl border bg-card/70 px-5 transition-colors hover:border-primary/40"
-                                    >
-                                        <span
-                                            aria-hidden
-                                            className={cn(
-                                                "flex size-11 shrink-0 items-center justify-center rounded-full font-heading text-lg font-semibold ring-1",
-                                                TONE_CLASSES[tone],
-                                            )}
-                                        >
-                                            {name.charAt(0)}
-                                        </span>
-                                        <span className="flex min-w-0 flex-col">
-                                            <span className="truncate font-heading text-base font-semibold">
-                                                {name}
-                                            </span>
-                                            <span className="truncate text-sm text-muted-foreground">
-                                                {t(`items.${key}.country`)}
-                                            </span>
-                                        </span>
-                                    </li>
-                                );
-                            })}
+                            {/* The second copy only fills the marquee width. */}
+                            {[...row, ...row].map(({ key, tone }, i) => (
+                                <PartnerCard
+                                    key={`${key}-${i}`}
+                                    partner={key}
+                                    tone={tone}
+                                    duplicate={i >= row.length}
+                                    className="w-64 shrink-0"
+                                />
+                            ))}
                         </ul>
                     );
                 })}
             </div>
         </SectionFrame>
+    );
+}
+
+function PartnerCard({
+    partner,
+    tone,
+    duplicate,
+    className,
+}: {
+    partner: PartnerKey;
+    tone: PartnerTone;
+    duplicate?: boolean;
+    className?: string;
+}) {
+    const t = useTranslations("landing.partners");
+    const name = t(`items.${partner}.name`);
+
+    return (
+        <li
+            aria-hidden={duplicate || undefined}
+            className={cn(
+                "flex h-20 items-center gap-4 rounded-2xl border bg-card/70 px-5 transition-colors hover:border-primary/40",
+                className,
+            )}
+        >
+            <span
+                aria-hidden
+                className={cn(
+                    "flex size-11 shrink-0 items-center justify-center rounded-full font-heading text-lg font-semibold ring-1",
+                    TONE_CLASSES[tone],
+                )}
+            >
+                {name.charAt(0)}
+            </span>
+            <span className="flex min-w-0 flex-col">
+                <span className="truncate font-heading text-base font-semibold">
+                    {name}
+                </span>
+                <span className="truncate text-sm text-muted-foreground">
+                    {t(`items.${partner}.country`)}
+                </span>
+            </span>
+        </li>
     );
 }

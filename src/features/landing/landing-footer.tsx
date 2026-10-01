@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 
 import { Logo } from "@/components/logo";
+import { SectionDivider } from "@/components/site/section-divider";
 import { LANDING_NAV } from "@/config/landing";
 import { ROUTES } from "@/config/routes";
 import { Link } from "@/i18n/navigation";
@@ -13,10 +14,7 @@ export function LandingFooter() {
 
     return (
         <footer id="footer" data-section className="relative border-t">
-            <div
-                aria-hidden
-                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/50 to-transparent"
-            />
+            <SectionDivider className="absolute inset-x-0 top-0" />
             <div className="container-wide py-16 lg:py-20">
                 <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.4fr_2fr]">
                     <div className="flex max-w-sm flex-col gap-6">
