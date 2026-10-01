@@ -746,7 +746,13 @@
             "text": "Orion Bank is a demo multi-currency wallet for fiat and crypto. It is a fictional product, not a real bank or financial service.",
             "primaryCta": "Open Account Free",
             "secondaryCta": "Contact Us",
+            "highlights": {
+                "fastOpening": "Account opening in minutes",
+                "transparentFees": "Transparent fees",
+                "support": "24/7 support"
+            },
             "stats": {
+                "label": "Orion Bank",
                 "countries": "Countries Supported",
                 "assets": "Assets Under Management",
                 "uptime": "System Uptime"

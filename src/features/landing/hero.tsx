@@ -6,7 +6,11 @@ import {
     ArrowRightIcon,
     ActivityIcon,
     GlobeIcon,
+    HeadsetIcon,
     LandmarkIcon,
+    ReceiptTextIcon,
+    StarsIcon,
+    TimerIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
@@ -14,7 +18,6 @@ import { useRef } from "react";
 import { useAppReady } from "@/components/app-ready";
 import { AnimatedCounter } from "@/components/effects/animated-counter";
 import { AuroraBackground } from "@/components/effects/aurora-background";
-import { Magnetic } from "@/components/effects/magnetic";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/routes";
@@ -23,6 +26,13 @@ import { Link } from "@/i18n/navigation";
 import { gsap, MOTION_QUERIES, useGSAP } from "@/lib/gsap";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
+
+// Selling points under the CTAs.
+const HERO_HIGHLIGHTS = [
+    { key: "fastOpening", icon: TimerIcon },
+    { key: "transparentFees", icon: ReceiptTextIcon },
+    { key: "support", icon: HeadsetIcon },
+] as const;
 
 // Decorative stats panel: values count up one after another, 1 s each.
 const HERO_STATS = [
@@ -67,7 +77,11 @@ function HeroVisual() {
                     <span className="size-3 rounded-full bg-destructive/70" />
                     <span className="size-3 rounded-full bg-warning/70" />
                     <span className="size-3 rounded-full bg-success/70" />
-                    <div className="mx-auto h-7 w-full max-w-60 rounded-lg bg-muted/60" />
+                    <div className="mx-auto flex h-7 w-full max-w-60 items-center justify-center rounded-lg bg-muted/60">
+                        <p className="text-sm font-medium text-muted-foreground">
+                            {t("label")}
+                        </p>
+                    </div>
                 </div>
 
                 <div className="space-y-5 p-5">
@@ -192,6 +206,7 @@ export function Hero() {
                             variant="glow"
                             className="mb-6 tracking-widest uppercase"
                         >
+                            <StarsIcon className="mr-2 size-4 text-accent" />
                             {t("eyebrow")}
                         </Badge>
                     </motion.div>
@@ -248,6 +263,25 @@ export function Hero() {
                             </Link>
                         </Button>
                     </motion.div>
+
+                    <motion.ul
+                        initial={{ opacity: 0, y: 24 }}
+                        animate={ready ? { opacity: 1, y: 0 } : undefined}
+                        transition={{ duration: 0.7, delay: 0.4 }}
+                        className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-6 lg:justify-start"
+                    >
+                        {HERO_HIGHLIGHTS.map(({ key, icon: Icon }) => (
+                            <li
+                                key={key}
+                                className="flex items-center gap-2.5 text-sm font-medium text-muted-foreground"
+                            >
+                                <span className="flex size-7 shrink-0 items-center justify-center text-accent">
+                                    <Icon aria-hidden className="size-3.5" />
+                                </span>
+                                {t(`highlights.${key}`)}
+                            </li>
+                        ))}
+                    </motion.ul>
                 </div>
 
                 {/* Hidden on small screens so the hero fits one viewport. */}
