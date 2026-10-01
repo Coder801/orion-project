@@ -72,7 +72,7 @@ export function Contact() {
     useGSAP(
         () => {
             const mm = gsap.matchMedia();
-            mm.add(MOTION_QUERIES.motion, () => {
+            mm.add(MOTION_QUERIES.desktop, () => {
                 gsap.fromTo(
                     "[data-contact-word]",
                     { xPercent: 10 },

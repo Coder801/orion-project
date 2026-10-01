@@ -8,7 +8,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 // Register once; every scroll animation imports gsap from here.
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, useGSAP);
 
-/** Media conditions shared by scroll animations (`gsap.matchMedia`). */
+/**
+ * Media conditions shared by animations (`gsap.matchMedia`). Scroll-driven
+ * effects use `desktop`: phones get static content and native scrolling.
+ */
 export const MOTION_QUERIES = {
     motion: "(prefers-reduced-motion: no-preference)",
     desktop: "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",

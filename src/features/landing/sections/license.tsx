@@ -108,7 +108,7 @@ export function License({ items }: LicenseProps) {
                                         {t(`states.${state}`)}
                                     </Badge>
                                 </div>
-                                <span className="mt-auto pt-10 font-mono text-xs text-muted-foreground">
+                                <span className="mt-auto pt-5 font-mono text-xs text-muted-foreground">
                                     {String(index + 1).padStart(2, "0")} /{" "}
                                     {String(items.length).padStart(2, "0")}
                                 </span>

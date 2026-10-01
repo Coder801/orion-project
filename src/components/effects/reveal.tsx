@@ -3,6 +3,7 @@
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useAppReady } from "@/components/app-ready";
+import { useScrollMotion } from "@/lib/hooks/useScrollMotion";
 
 type Direction = "up" | "down" | "left" | "right" | "none";
 
@@ -33,7 +34,10 @@ export function Reveal({
 }) {
     const reduced = useReducedMotion();
     const ready = useAppReady();
+    const scrollMotion = useScrollMotion();
     const { x, y } = offsets[direction];
+
+    if (!scrollMotion) return <div className={className}>{children}</div>;
 
     return (
         <motion.div
@@ -80,6 +84,15 @@ export function RevealStagger({
     delay?: number;
 }) {
     const ready = useAppReady();
+    const scrollMotion = useScrollMotion();
+
+    // Static: items render in their visible state straight away.
+    if (!scrollMotion)
+        return (
+            <motion.div className={className} initial={false} animate="visible">
+                {children}
+            </motion.div>
+        );
 
     return (
         <motion.div

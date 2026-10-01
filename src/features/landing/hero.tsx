@@ -126,51 +126,38 @@ export function Hero() {
     const scope = useRef<HTMLElement>(null);
 
     // Leaving the hero: the copy lifts and fades while the preview straightens
-    // from a slight 3D tilt (desktop only) — scrubbed by the transition to the
-    // next section.
+    // from a slight 3D tilt — scrubbed by the transition to the next section.
+    // Desktop only: on phones the hero scrolls away statically.
     // Separate wrappers keep GSAP off framer-motion's nodes.
     useGSAP(
         () => {
             const mm = gsap.matchMedia();
-            mm.add(
-                {
-                    motion: MOTION_QUERIES.motion,
-                    desktop: MOTION_QUERIES.desktop,
-                },
-                (context) => {
-                    const { motion, desktop } = context.conditions ?? {};
-                    if (!motion) return;
-                    const scrollTrigger = {
-                        trigger: scope.current,
-                        start: "top top",
-                        end: "bottom top",
-                        scrub: true,
-                    };
-                    gsap.to("[data-hero-copy]", {
-                        yPercent: -30,
-                        scale: 0.92,
-                        autoAlpha: 0,
-                        ease: "none",
-                        scrollTrigger,
-                    });
-                    // The 3D tilt only reads well beside the copy (two-column
-                    // layout); stacked under it, the preview stays flat.
-                    const tilt = desktop
-                        ? {
-                              rotateY: -12,
-                              rotateX: 6,
-                              transformPerspective: 1400,
-                          }
-                        : { rotateY: 0, rotateX: 0 };
-                    gsap.fromTo("[data-hero-visual]", tilt, {
+            mm.add(MOTION_QUERIES.desktop, () => {
+                const scrollTrigger = {
+                    trigger: scope.current,
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true,
+                };
+                gsap.to("[data-hero-copy]", {
+                    yPercent: -30,
+                    scale: 0.92,
+                    autoAlpha: 0,
+                    ease: "none",
+                    scrollTrigger,
+                });
+                gsap.fromTo(
+                    "[data-hero-visual]",
+                    { rotateY: -12, rotateX: 6, transformPerspective: 1400 },
+                    {
                         rotateY: 0,
                         rotateX: 0,
                         yPercent: -15,
                         ease: "none",
                         scrollTrigger,
-                    });
-                },
-            );
+                    },
+                );
+            });
         },
         { scope },
     );

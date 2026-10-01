@@ -10,6 +10,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { useAppReady } from "@/components/app-ready";
+import { useScrollMotion } from "@/lib/hooks/useScrollMotion";
 
 const EASE: [number, number, number, number] = [0.21, 0.47, 0.32, 0.98];
 
@@ -35,7 +36,15 @@ export function TextReveal({
     const reduced = useReducedMotion();
     const ready = useAppReady();
     const inView = useInView(ref, { once: true, margin: "-80px" });
+    const scrollMotion = useScrollMotion();
     const show = ready && inView;
+
+    if (!scrollMotion)
+        return (
+            <span ref={ref} className={cn("block", className)}>
+                {children}
+            </span>
+        );
 
     if (reduced) {
         return (

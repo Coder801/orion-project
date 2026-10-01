@@ -11,7 +11,7 @@ type Timeline = ReturnType<typeof gsap.timeline>;
  * Entrance animation for a full-page section: `[data-reveal]` elements fade
  * up, plus whatever `build` adds. The timeline is created paused (content
  * starts hidden) and plays once, when the section first becomes active.
- * Reduced-motion users get static content.
+ * Phones and reduced-motion users get static content.
  */
 export function useEnterTimeline(
     scope: RefObject<HTMLElement | null>,
@@ -22,7 +22,7 @@ export function useEnterTimeline(
     useGSAP(
         () => {
             const mm = gsap.matchMedia();
-            mm.add(MOTION_QUERIES.motion, () => {
+            mm.add(MOTION_QUERIES.desktop, () => {
                 const root = scope.current;
                 if (!root) return;
                 const tl = gsap.timeline({

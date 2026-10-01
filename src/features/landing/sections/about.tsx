@@ -26,7 +26,7 @@ export function About({ tabs }: AboutProps) {
     useGSAP(
         () => {
             const mm = gsap.matchMedia();
-            mm.add(MOTION_QUERIES.motion, () => {
+            mm.add(MOTION_QUERIES.desktop, () => {
                 gsap.fromTo(
                     "[data-about-orb]",
                     { yPercent: 40 },
@@ -92,7 +92,7 @@ export function About({ tabs }: AboutProps) {
                     <TabsList className="max-w-full overflow-x-auto">
                         {tabs.map(({ key, icon: Icon }) => (
                             <TabsTrigger key={key} value={key}>
-                                <Icon aria-hidden />
+                                <Icon aria-hidden className="max-sm:hidden" />
                                 {t(`tabs.${key}.label`)}
                             </TabsTrigger>
                         ))}

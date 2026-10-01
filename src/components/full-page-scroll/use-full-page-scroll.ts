@@ -73,7 +73,8 @@ const SWIPE_MIN_DELTA = 8;
  * is scrolled through (page scroll, no inner scrollbar) until its edge first;
  * nested `overflow-y: auto` areas likewise scroll to their edge first.
  * Elements marked `data-fullpage-horizontal` turn vertical wheel into
- * horizontal scrolling. Disabled under `prefers-reduced-motion` (native scroll).
+ * horizontal scrolling. Desktop only: below the `lg` breakpoint and under
+ * `prefers-reduced-motion` the page scrolls natively.
  * While active the container carries `data-fullpage-active`.
  */
 export function useFullPageScroll(
@@ -598,7 +599,7 @@ export function useFullPageScroll(
         };
 
         const mm = gsap.matchMedia();
-        mm.add(MOTION_QUERIES.motion, () => {
+        mm.add(MOTION_QUERIES.desktop, () => {
             container.setAttribute("data-fullpage-active", "");
             const previousRestoration = window.history.scrollRestoration;
             window.history.scrollRestoration = "manual";

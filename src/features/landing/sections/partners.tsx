@@ -56,7 +56,7 @@ export function Partners({ items }: { items: PartnerItem[] }) {
     useGSAP(
         () => {
             const mm = gsap.matchMedia();
-            mm.add(MOTION_QUERIES.motion, () => {
+            mm.add(MOTION_QUERIES.desktop, () => {
                 gsap.utils
                     .toArray<HTMLElement>("[data-partner-row]", scope.current)
                     .forEach((row, i) => {
