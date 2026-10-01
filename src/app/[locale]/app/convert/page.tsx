@@ -1,7 +1,7 @@
-import { RequireKyc } from "@/features/auth/guards";
-import { ConvertForm } from "@/features/convert/convert-form";
-import { UserRequests } from "@/features/payments/user-requests";
-import { Page } from "@/features/shared/page";
+import { RequireKyc } from "@/features/auth/Guards";
+import { ConvertForm } from "@/features/convert/ConvertForm";
+import { UserRequests } from "@/features/payments/UserRequests";
+import { Page } from "@/features/shared/Page";
 import { pageMetadata } from "@/lib/metadata";
 
 export const generateMetadata = pageMetadata("convert");

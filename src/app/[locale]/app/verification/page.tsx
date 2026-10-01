@@ -1,5 +1,5 @@
-import { Page } from "@/features/shared/page";
-import { Verification } from "@/features/verification/verification";
+import { Page } from "@/features/shared/Page";
+import { Verification } from "@/features/verification/Verification";
 import { pageMetadata } from "@/lib/metadata";
 
 export const generateMetadata = pageMetadata("verification");

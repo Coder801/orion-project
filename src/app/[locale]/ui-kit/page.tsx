@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { hasLocale, useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
-import { LanguageSwitcher } from "@/components/layout/language-switcher";
-import { PageHeader } from "@/components/layout/page-header";
-import { Logo } from "@/components/logo";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Logo } from "@/components/Logo";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { routing } from "@/i18n/routing";
-import { UiKitShowcase } from "./ui-kit-showcase";
+import { UiKitShowcase } from "./UiKitShowcase";
 
 export async function generateMetadata({
     params,

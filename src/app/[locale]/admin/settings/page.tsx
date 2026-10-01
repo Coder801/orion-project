@@ -1,5 +1,5 @@
-import { PlatformSettingsForm } from "@/features/admin/platform-settings-form";
-import { Page } from "@/features/shared/page";
+import { PlatformSettingsForm } from "@/features/admin/PlatformSettingsForm";
+import { Page } from "@/features/shared/Page";
 import { pageMetadata } from "@/lib/metadata";
 
 export const generateMetadata = pageMetadata("adminSettings");

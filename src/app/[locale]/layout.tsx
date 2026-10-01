@@ -5,11 +5,11 @@ import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
-import { AppReadyProvider } from "@/components/app-ready";
-import { DemoBanner } from "@/components/layout/demo-banner";
-import { PageLoader } from "@/components/site/page-loader";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
+import { AppReadyProvider } from "@/components/AppReady";
+import { DemoBanner } from "@/components/layout/DemoBanner";
+import { PageLoader } from "@/components/site/PageLoader";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { Toaster } from "@/components/ui/Sonner";
 import { routing } from "@/i18n/routing";
 import { initialAuthState } from "@/store/authSlice";
 import { parseSessionCookie, SESSION_COOKIE } from "@/store/persistence";

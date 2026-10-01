@@ -1,4 +1,4 @@
-import { LandingHeader } from "@/features/landing/landing-header";
+import { LandingHeader } from "@/features/landing/LandingHeader";
 import { LandingSections } from "@/features/landing/sections";
 
 export default function LandingPage() {

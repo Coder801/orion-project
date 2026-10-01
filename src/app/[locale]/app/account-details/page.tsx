@@ -1,5 +1,5 @@
-import { AccountDetails } from "@/features/accounts/account-details";
-import { Page } from "@/features/shared/page";
+import { AccountDetails } from "@/features/accounts/AccountDetails";
+import { Page } from "@/features/shared/Page";
 import { pageMetadata } from "@/lib/metadata";
 
 export const generateMetadata = pageMetadata("accountDetails");

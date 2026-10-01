@@ -1,5 +1,5 @@
-import { Settings } from "@/features/settings/settings";
-import { Page } from "@/features/shared/page";
+import { Settings } from "@/features/settings/Settings";
+import { Page } from "@/features/shared/Page";
 import { pageMetadata } from "@/lib/metadata";
 
 export const generateMetadata = pageMetadata("settings");

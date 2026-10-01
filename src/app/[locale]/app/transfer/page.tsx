@@ -1,7 +1,7 @@
-import { RequireKyc } from "@/features/auth/guards";
-import { UserRequests } from "@/features/payments/user-requests";
-import { Page } from "@/features/shared/page";
-import { TransferForm } from "@/features/transfer/transfer-form";
+import { RequireKyc } from "@/features/auth/Guards";
+import { UserRequests } from "@/features/payments/UserRequests";
+import { Page } from "@/features/shared/Page";
+import { TransferForm } from "@/features/transfer/TransferForm";
 import { pageMetadata } from "@/lib/metadata";
 
 export const generateMetadata = pageMetadata("transfer");

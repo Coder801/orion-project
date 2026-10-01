@@ -48,7 +48,7 @@ src/
     layout/            # app-shell, app-sidebar, app-topbar, notifications-menu, demo-banner, language-switcher, page-header
     effects/           # theme effects: aurora, reveal, spotlight-card, marquee, magnetic, smooth-scroll…
     site/              # page-loader (first-paint splash), section-heading
-    logo.tsx, theme-toggle.tsx, theme-provider.tsx, app-ready.tsx
+    Logo.tsx, ThemeToggle.tsx, ThemeProvider.tsx, AppReady.tsx
   config/              # currencies, payment methods, landing sections, navigation, route rules
   domain/              # types, money (bigint minor units), rules, ledger (submitRequest/applyRequest), review, rates
   data/                # Repository interface, MockRepository (in-memory + localStorage), seed, MockRatesProvider, blob store
@@ -99,10 +99,10 @@ Access control: `proxy.ts` redirects by the session cookie (optimistic); `<Requi
 
 ### Components
 - Default to **server components**; mark interactive parts `"use client"`.
-- Reuse the theme primitives in `components/ui`; forms use the labelled wrappers from `components/ui/form-field.tsx` (selects are controlled — wire them with react-hook-form `Controller`).
-- Screens are built from `features/shared/panel.tsx` (theme card style; `flush` for edge-to-edge tables), `form-status.tsx` (FormError/FormSuccess) and `summary-list.tsx`.
-- Handle three states for lists/forms: loading (skeletons), empty, error — `features/shared/async-content.tsx`.
-- New component files use kebab-case (theme convention); `domain/`, `data/`, `store/` keep their existing names.
+- Reuse the theme primitives in `components/ui`; forms use the labelled wrappers from `components/ui/FormField.tsx` (selects are controlled — wire them with react-hook-form `Controller`).
+- Screens are built from `features/shared/Panel.tsx` (theme card style; `flush` for edge-to-edge tables), `FormStatus.tsx` (FormError/FormSuccess) and `SummaryList.tsx`.
+- Handle three states for lists/forms: loading (skeletons), empty, error — `features/shared/AsyncContent.tsx`.
+- Component files (`.tsx`) use PascalCase (`AppShell.tsx`); Next.js route files in `app/` (`page.tsx`, `layout.tsx`…), `index.tsx` and folder names stay as they are. Non-component modules (`.ts`: services, schemas, hooks, utils) keep their existing names. Rename case-only with a two-step `git mv` (macOS is case-insensitive); `npm run lint:case` catches mismatches.
 
 ### Styling
 - Design tokens are CSS variables in `src/app/globals.css` (`:root` light, `.dark` dark) mapped to Tailwind via `@theme inline` (`primary`, `secondary`, `accent`, `background`, `card`, `muted`, `border`…). Reference tokens, not raw hex values; `lib/brand-colors.ts` is only for SVG gradients.

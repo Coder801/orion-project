@@ -1,5 +1,5 @@
-import { CreditReviews } from "@/features/admin/product-reviews";
-import { Page } from "@/features/shared/page";
+import { CreditReviews } from "@/features/admin/ProductReviews";
+import { Page } from "@/features/shared/Page";
 import { pageMetadata } from "@/lib/metadata";
 
 export const generateMetadata = pageMetadata("credits");

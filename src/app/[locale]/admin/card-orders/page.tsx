@@ -1,5 +1,5 @@
-import { CardOrderReviews } from "@/features/admin/product-reviews";
-import { Page } from "@/features/shared/page";
+import { CardOrderReviews } from "@/features/admin/ProductReviews";
+import { Page } from "@/features/shared/Page";
 import { pageMetadata } from "@/lib/metadata";
 
 export const generateMetadata = pageMetadata("cardOrders");

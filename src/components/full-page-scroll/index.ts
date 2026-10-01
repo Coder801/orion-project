@@ -1,4 +1,4 @@
-export { FullPageScroll } from "./full-page-scroll";
+export { FullPageScroll } from "./FullPageScroll";
 export {
     SECTION_ENTER_EVENT,
     useSectionEnter,

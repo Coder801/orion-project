@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-import { AppShell } from "@/components/layout/app-shell";
-import { RequireAuth, RequireRole } from "@/features/auth/guards";
+import { AppShell } from "@/components/layout/AppShell";
+import { RequireAuth, RequireRole } from "@/features/auth/Guards";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
     return (

@@ -4,8 +4,8 @@ import { HomeIcon, RefreshCwIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
-import { AuroraBackground } from "@/components/effects/aurora-background";
-import { Button } from "@/components/ui/button";
+import { AuroraBackground } from "@/components/effects/AuroraBackground";
+import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/navigation";
 
 export default function ErrorPage({

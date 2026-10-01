@@ -2,14 +2,14 @@
 
 import { FullPageScroll } from "@/components/full-page-scroll";
 import { LANDING_SECTIONS, type LandingSection } from "@/config/landing";
-import { Hero } from "@/features/landing/hero";
-import { LandingFooter } from "@/features/landing/landing-footer";
-import { About } from "@/features/landing/sections/about";
-import { Contact } from "@/features/landing/sections/contact";
-import { License } from "@/features/landing/sections/license";
-import { Partners } from "@/features/landing/sections/partners";
-import { Services } from "@/features/landing/sections/services";
-import { Support } from "@/features/landing/sections/support";
+import { Hero } from "@/features/landing/Hero";
+import { LandingFooter } from "@/features/landing/LandingFooter";
+import { About } from "@/features/landing/sections/About";
+import { Contact } from "@/features/landing/sections/Contact";
+import { License } from "@/features/landing/sections/License";
+import { Partners } from "@/features/landing/sections/Partners";
+import { Services } from "@/features/landing/sections/Services";
+import { Support } from "@/features/landing/sections/Support";
 
 // Client-side on purpose: section configs carry icon components, which can't
 // cross the server → client boundary as props.

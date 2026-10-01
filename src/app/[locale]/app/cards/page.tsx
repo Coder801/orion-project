@@ -1,6 +1,6 @@
-import { RequireKyc } from "@/features/auth/guards";
-import { Cards } from "@/features/products/cards";
-import { Page } from "@/features/shared/page";
+import { RequireKyc } from "@/features/auth/Guards";
+import { Cards } from "@/features/products/Cards";
+import { Page } from "@/features/shared/Page";
 import { pageMetadata } from "@/lib/metadata";
 
 export const generateMetadata = pageMetadata("cards");

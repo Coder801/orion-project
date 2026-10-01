@@ -5,10 +5,10 @@ import type { ReactNode } from "react";
 import {
     AuroraBackground,
     GlowSpot,
-} from "@/components/effects/aurora-background";
-import { LanguageSwitcher } from "@/components/layout/language-switcher";
-import { Logo, LogoMark } from "@/components/logo";
-import { ThemeToggle } from "@/components/theme-toggle";
+} from "@/components/effects/AuroraBackground";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { Logo, LogoMark } from "@/components/Logo";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link } from "@/i18n/navigation";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {

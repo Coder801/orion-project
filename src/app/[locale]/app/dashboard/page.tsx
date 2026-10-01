@@ -1,5 +1,5 @@
-import { Dashboard } from "@/features/dashboard/dashboard";
-import { Page } from "@/features/shared/page";
+import { Dashboard } from "@/features/dashboard/Dashboard";
+import { Page } from "@/features/shared/Page";
 import { pageMetadata } from "@/lib/metadata";
 
 export const generateMetadata = pageMetadata("dashboard");

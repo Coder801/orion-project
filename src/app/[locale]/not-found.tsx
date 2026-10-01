@@ -4,8 +4,8 @@ import { useTranslations } from "next-intl";
 import {
     AuroraBackground,
     GlowSpot,
-} from "@/components/effects/aurora-background";
-import { Button } from "@/components/ui/button";
+} from "@/components/effects/AuroraBackground";
+import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/navigation";
 
 export default function NotFound() {
