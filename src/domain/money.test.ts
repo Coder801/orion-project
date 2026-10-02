@@ -4,6 +4,7 @@ import {
     crossRate,
     decimalToMinor,
     feeFromBps,
+    maxAmountWithFee,
     MoneyError,
     minorToDecimal,
 } from "@/domain/money";
@@ -58,5 +59,22 @@ describe("conversions", () => {
     it("computes cross rates", () => {
         expect(crossRate("1", "64000")).toBe("0.00001562");
         expect(crossRate("1.08", "1")).toBe("1.08");
+    });
+});
+
+describe("maxAmountWithFee", () => {
+    it("leaves room for a rounded-up fee", () => {
+        expect(maxAmountWithFee("10025", 25)).toBe("10000");
+        expect(maxAmountWithFee("10000", 25)).toBe("9975");
+        expect(maxAmountWithFee("10000", 0)).toBe("10000");
+        expect(maxAmountWithFee("0", 25)).toBe("0");
+    });
+
+    it("never exceeds the available balance", () => {
+        for (const available of ["1", "7", "999", "123457"]) {
+            const amount = maxAmountWithFee(available, 33);
+            const total = BigInt(amount) + BigInt(feeFromBps(amount, 33));
+            expect(total <= BigInt(available)).toBe(true);
+        }
     });
 });

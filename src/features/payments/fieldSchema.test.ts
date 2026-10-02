@@ -90,11 +90,20 @@ describe("method schemas", () => {
         expect(
             schema.safeParse({
                 holderName: "Jane Doe",
-                accountNumber: "12345678",
-                routingNumber: "011000015",
+                iban: "DE89370400440532013000",
+                bic: "DEUTDEFF",
                 reference: "",
             }).success,
         ).toBe(true);
+    });
+
+    it("still validates optional fields that are filled in", () => {
+        const schema = buildFieldsSchema(method("sepa-out").fields, []);
+        const base = { holderName: "Jane Doe", iban: "DE89370400440532013000" };
+        expect(schema.safeParse({ ...base, bic: "" }).success).toBe(true);
+        expect(firstError(schema.safeParse({ ...base, bic: "nope" }))).toBe(
+            "bic",
+        );
     });
 });
 

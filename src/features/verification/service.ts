@@ -3,7 +3,10 @@ import { DomainError } from "@/domain/errors";
 import type { KycSubmission } from "@/domain/types";
 import { byNewest, requireUser } from "@/features/user/service";
 
-export type KycInput = Pick<KycSubmission, "personal" | "address" | "document">;
+export type KycInput = Pick<
+    KycSubmission,
+    "personal" | "address" | "document" | "selfie"
+>;
 
 export function getLatestKyc(userId: string): Promise<KycSubmission | null> {
     return withLatency(

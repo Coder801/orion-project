@@ -118,3 +118,16 @@ export function crossRate(
 function trimZeros(value: DecimalString): DecimalString {
     return value.includes(".") ? value.replace(/\.?0+$/, "") : value;
 }
+
+/** Largest amount whose amount + fee(bps, rounded up) still fits into `available`. */
+export function maxAmountWithFee(available: Minor, bps: number): Minor {
+    const cap = toBig(available);
+    if (cap <= 0n) return ZERO;
+    let amount = (cap * 10_000n) / (10_000n + BigInt(bps));
+    while (
+        amount > 0n &&
+        amount + toBig(feeFromBps(fromBig(amount), bps)) > cap
+    )
+        amount -= 1n;
+    return fromBig(amount);
+}

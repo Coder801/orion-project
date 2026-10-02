@@ -2,11 +2,12 @@ import type {
     Account,
     AnyRequest,
     AuditEntry,
-    CardOrder,
+    Beneficiary,
     CreditApplication,
     KycSubmission,
     Notification,
     PlatformSettings,
+    Session,
     SupportTicket,
     Transaction,
     User,
@@ -31,7 +32,8 @@ export interface Repository {
     requests: Collection<AnyRequest>;
     kyc: Collection<KycSubmission>;
     credits: Collection<CreditApplication>;
-    cardOrders: Collection<CardOrder>;
+    beneficiaries: Collection<Beneficiary>;
+    sessions: Collection<Session>;
     tickets: Collection<SupportTicket>;
     notifications: Collection<Notification>;
     audit: Collection<AuditEntry>;

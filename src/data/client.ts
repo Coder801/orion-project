@@ -1,3 +1,4 @@
+import { RATES_REFRESH_MS } from "@/config/currencies";
 import { MockRatesProvider } from "@/data/MockRatesProvider";
 import { MockRepository, type DbState } from "@/data/MockRepository";
 import type { Repository } from "@/data/repository";
@@ -40,7 +41,10 @@ export function getRepository(): Repository {
 }
 
 export function getRatesProvider(): RatesProvider {
-    rates ??= new MockRatesProvider(() => getRepository().settings.get());
+    rates ??= new MockRatesProvider(() => getRepository().settings.get(), {
+        bps: 15,
+        periodMs: RATES_REFRESH_MS,
+    });
     return rates;
 }
 

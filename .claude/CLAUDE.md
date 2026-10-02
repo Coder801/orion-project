@@ -64,16 +64,17 @@ src/
 
 - `/[locale]` — **Landing**: sections rendered from `config/landing.ts` (Hero, About, Services, Partners, License, Support, Contact us, Footer), one component per section in `features/landing/sections/`, each at least `min-h-svh` on desktop (`lg`+; on mobile content-height with a `SectionDivider` between them) with ScrollTrigger effects (desktop only) (Services is a 3×2 card grid, License cards stack); sections marked `data-snap` get proximity snapping (`lenis/snap` in `SmoothScroll`, CSS scroll-snap when Lenis is off); header links scroll to anchors; the contact form goes through the mock `sendContactMessage` mutation (nothing is sent).
 - `/[locale]/auth/sign-in | sign-up | forgot-password` — mock auth; sign-in accepts any registered email + any password of 8+ chars (demo accounts listed on the page).
-- `/[locale]/app/*` — `dashboard`, `deposit`, `withdraw`, `transfer`, `convert`, `verification`, `credit`, `cards`, `account-details`, `settings`, `support`.
-- `/[locale]/admin/*` — `registrations` (users + KYC review), `requests`, `conversions`, `credits`, `card-orders`, `settings` (currencies, methods, rates, fees, reset demo data).
+- `/[locale]/app/*` — `dashboard`, `transactions`, `deposit`, `withdraw`, `transfer`, `convert`, `verification`, `credit`, `cards`, `account-details`, `settings`, `support`, `about`. Page spec: `docs/admin-panel-scheme.md`.
+- `/[locale]/admin/*` — `registrations` (users + KYC review), `requests`, `conversions`, `credits`, `card-orders` (`card` requests: plan upgrades and physical cards), `settings` (currencies, methods, rates, fees, reset demo data).
 
 Access control: `proxy.ts` redirects by the session cookie (optimistic); `<RequireAuth>`, `<RequireRole>`, `<RequireKyc>` repeat the checks on the client. Both use `redirectFor()` from `config/routes.ts`.
 
 ### Business rules
 - Balances change **only** in `applyRequest()` (`domain/ledger.ts`) when an admin approves — atomic (repository transaction with rollback) and idempotent.
-- Debit requests (withdrawal, transfer, conversion) move `amount + fee` to `hold` on creation; rejection releases the hold.
-- Deposit/withdrawal forms are generated from `config/methods.ts` field schemas + zod (`features/payments/fieldSchema.ts`).
-- Conversions quote through the `RatesProvider` interface; the rate is locked in the request.
+- Debit requests (withdrawal, transfer, conversion, card) move `amount + fee` to `hold` on creation; rejection releases the hold. Card plan upgrades and physical card orders are `card` requests; approving a plan switches `user.cardPlan`.
+- Withdrawal forms are generated from `config/methods.ts` field schemas + zod (`features/payments/fieldSchema.ts`); deposit methods show bank details / provider checkout / a crypto address instead (`DEPOSIT_FLOW`). Amount limits per currency live in `settings.limits`.
+- Withdrawals and transfers require a 6-digit step-up code (mock: any 6 digits). Card numbers are "tokenized" in the service — only a token + last 4 are stored.
+- Conversions: the UI shows indicative prices (`rates` query, mock feed moves every 30 s); "Convert now" locks a quote (`QUOTE_TTL_MS`) and the request is created by `quoteId`, never from client figures.
 - KYC-gated operations are listed in `KYC_REQUIRED_OPERATIONS`; services enforce them too, not just the UI.
 - Every review status change creates a user Notification and an AuditEntry.
 - Money is integer minor units stored as strings; arithmetic via `domain/money.ts` (bigint), never floats.

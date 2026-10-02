@@ -9,7 +9,10 @@
         "goToApp": "Open dashboard",
         "close": "Close",
         "cancel": "Cancel",
-        "confirm": "Confirm"
+        "confirm": "Confirm",
+        "fiat": "Fiat",
+        "crypto": "Crypto",
+        "qrPlaceholder": "Demo QR placeholder — not scannable"
     },
     "nav": {
         "dashboard": "Dashboard",
@@ -28,7 +31,9 @@
         "conversions": "Conversions",
         "credits": "Credits",
         "cardOrders": "Card orders",
-        "adminSettings": "Platform settings"
+        "adminSettings": "Platform settings",
+        "transactions": "Transactions",
+        "about": "About"
     },
     "layout": {
         "skipToContent": "Skip to content",
@@ -87,13 +92,18 @@
         "txHash": "Invalid transaction hash",
         "network": "Choose a network",
         "birthDate": "You must be at least 18",
-        "fileRequired": "Attach at least one file",
-        "fileTooLarge": "File is larger than 5 MB",
-        "fileType": "Only PNG, JPEG or PDF",
+        "fileRequired": "Attach a file",
+        "fileTooLarge": "File is too large",
+        "fileType": "This file type is not supported",
         "price": "Enter a positive number (up to 8 decimals)",
         "bps": "Whole number from 0 to 10000",
         "sameAccount": "Choose a different account",
-        "sameCurrency": "Choose a different currency"
+        "sameCurrency": "Choose a different currency",
+        "amountOutOfRange": "Amount is outside the allowed limits",
+        "termRange": "Enter a whole number of months within the allowed range",
+        "consent": "Please accept the terms to continue",
+        "code": "Enter the 6-digit code",
+        "passwordWeak": "The password does not meet all the rules"
     },
     "domainErrors": {
         "notFound": "Not found",
@@ -113,7 +123,13 @@
         "recipientSelf": "You cannot send to yourself",
         "reasonRequired": "A reason is required",
         "invariant": "Operation failed and was rolled back",
-        "unknown": "Something went wrong"
+        "unknown": "Something went wrong",
+        "amountOutOfRange": "Amount is outside the allowed limits",
+        "invalidCode": "The confirmation code is invalid",
+        "invalidDetails": "Recipient details are invalid",
+        "quoteExpired": "The quote has expired — request a new one",
+        "planUnavailable": "This plan cannot be selected",
+        "requestPending": "A similar request is already awaiting review"
     },
     "status": {
         "pending": "Pending",
@@ -157,7 +173,7 @@
         },
         "cards": {
             "title": "Cards",
-            "description": "Order a card and track orders"
+            "description": "Choose a card plan"
         },
         "accountDetails": {
             "title": "Account details",
@@ -194,6 +210,14 @@
         "adminSettings": {
             "title": "Platform settings",
             "description": "Currencies, methods, rates and fees"
+        },
+        "transactions": {
+            "title": "Transactions",
+            "description": "Full history of your operations"
+        },
+        "about": {
+            "title": "About",
+            "description": "What the service offers"
         }
     },
     "kycGate": {
@@ -255,13 +279,63 @@
         }
     },
     "dashboard": {
-        "balances": "Balances",
+        "welcome": "Welcome back, {name}",
+        "kyc": "Verification: {status}",
+        "kycStatus": {
+            "none": "not started",
+            "pending": "under review",
+            "approved": "approved",
+            "rejected": "rejected"
+        },
+        "accounts": "Accounts",
+        "accountType": {
+            "fiat": "Fiat",
+            "crypto": "Crypto"
+        },
         "noAccounts": "No accounts yet",
         "onHold": "On hold",
         "available": "Available",
-        "hold": "Hold",
         "recentTransactions": "Recent transactions",
         "noTransactions": "No transactions yet",
+        "viewAll": "View all",
+        "actions": {
+            "label": "Quick actions",
+            "deposit": "Deposit",
+            "withdraw": "Withdraw",
+            "transfer": "Transfer"
+        },
+        "card": {
+            "totalBalance": "Total balance",
+            "demo": "Demo",
+            "holder": "Card holder",
+            "expires": "Expires",
+            "showBack": "Show the back of the card",
+            "showFront": "Show the front of the card",
+            "backNote": "Demo card. Not a real payment card; the full number is never shown.",
+            "flip": "Flip",
+            "skin": "Skin: {skin}",
+            "skins": {
+                "aurora": "Aurora",
+                "nebula": "Nebula",
+                "ember": "Ember",
+                "graphite": "Graphite"
+            }
+        },
+        "physicalCard": {
+            "title": "Physical card",
+            "text": "Order a physical card for {price}. Delivery takes {min}–{max} business days.",
+            "cta": "Order physical card",
+            "ordered": "Your physical card order:",
+            "kycNote": "Available after verification.",
+            "dialogTitle": "Order a physical card",
+            "dialogDescription": "The price is held now and charged when the order is approved.",
+            "delivery": "Delivery in {min}–{max} business days",
+            "payFrom": "Pay from",
+            "chooseAccount": "Choose account",
+            "noFunds": "No {currency} account has enough available funds.",
+            "address": "Delivery address",
+            "confirm": "Confirm order"
+        },
         "notifications": "Notifications",
         "markAllRead": "Mark all read",
         "noNotifications": "No notifications"
@@ -274,21 +348,26 @@
             "withdrawal": "Withdrawal",
             "transfer": "Transfer",
             "conversion": "Conversion",
+            "card": "Card payment",
             "kyc": "Verification",
-            "credit": "Credit application",
-            "cardOrder": "Card order"
+            "credit": "Credit application"
         }
     },
     "transactions": {
+        "title": "Transactions",
         "date": "Date",
         "type": "Type",
         "status": "Status",
         "amount": "Amount",
+        "currency": "Currency",
+        "all": "All",
+        "empty": "No transactions match the filters",
         "types": {
             "deposit": "Deposit",
             "withdrawal": "Withdrawal",
             "transfer": "Transfer",
-            "conversion": "Conversion"
+            "conversion": "Conversion",
+            "card": "Card payment"
         }
     },
     "payments": {
@@ -306,20 +385,32 @@
         "totalDebit": "Total debit",
         "reviewNotice": "Balances change only after an administrator approves the request.",
         "submitDeposit": "Create deposit request",
-        "submitWithdrawal": "Create withdrawal request"
+        "submitWithdrawal": "Create withdrawal request",
+        "max": "MAX",
+        "limitsHint": "Limits: {min} – {max}"
     },
     "methods": {
-        "sepa-in": "Bank transfer (EUR)",
-        "wire-in": "Wire transfer",
+        "bank-in": "Bank transfer",
+        "sepa-in": "SEPA",
+        "wire-in": "Wire",
         "card-in": "Card",
         "crypto-in": "Crypto deposit",
-        "sepa-out": "Bank transfer (EUR)",
-        "wire-out": "Wire transfer",
-        "card-out": "Card payout",
-        "crypto-out": "Crypto withdrawal"
+        "sepa-out": "SEPA",
+        "wire-out": "Wire",
+        "card-out": "Card",
+        "crypto-out": "Crypto withdrawal",
+        "sepa-transfer": "SEPA transfer",
+        "wire-transfer": "Wire transfer",
+        "card-transfer": "Card transfer",
+        "internal": "Internal transfer",
+        "internal-own": "Between own accounts",
+        "internal-user": "To another user",
+        "rates": "Currency conversion",
+        "card-plan": "Card plan",
+        "physical-card": "Physical card"
     },
     "methodFields": {
-        "holderName": "Holder name",
+        "holderName": "Recipient name",
         "iban": "IBAN",
         "bic": "BIC / SWIFT",
         "accountNumber": "Account number",
@@ -349,11 +440,11 @@
             "deposit": "Deposit",
             "withdrawal": "Withdrawal",
             "transfer": "Transfer",
-            "conversion": "Conversion"
+            "conversion": "Conversion",
+            "card": "Card payment"
         }
     },
     "transfer": {
-        "created": "Transfer request created",
         "from": "From account",
         "chooseAccount": "Choose account",
         "to": "Recipient",
@@ -367,31 +458,99 @@
         "recipientHint": "The recipient must be registered",
         "amount": "Amount",
         "reviewNotice": "Funds are held until an administrator reviews the transfer.",
-        "submit": "Create transfer"
+        "typeLabel": "Transfer type",
+        "types": {
+            "sepa": {
+                "title": "SEPA transfer",
+                "text": "EU/EEA, euro only, 0–1 day"
+            },
+            "wire": {
+                "title": "Wire transfer",
+                "text": "International, 1–5 days"
+            },
+            "card": {
+                "title": "Card transfer",
+                "text": "To a Visa or Mastercard card"
+            },
+            "internal": {
+                "title": "Internal",
+                "text": "Own accounts or another user, instant review"
+            }
+        },
+        "sepaEurOnly": "SEPA transfers are available from EUR accounts only.",
+        "sender": "Sender",
+        "recipient": "Recipient",
+        "savedBeneficiaries": "Saved beneficiaries",
+        "newBeneficiary": "New beneficiary",
+        "fields": {
+            "name": "Beneficiary name",
+            "iban": "IBAN",
+            "bic": "BIC / SWIFT",
+            "bankAddress": "Bank address",
+            "bankCountry": "Bank country",
+            "cardNumber": "Card number",
+            "reference": "Reference"
+        },
+        "chooseCountry": "Choose country",
+        "cardTokenHint": "Tokenized by the card provider — only the last 4 digits are stored.",
+        "saveBeneficiary": "Save this beneficiary",
+        "continue": "Continue",
+        "confirmTitle": "Confirm transfer",
+        "summary": {
+            "type": "Type",
+            "from": "From",
+            "recipient": "Recipient",
+            "amount": "Amount",
+            "fee": "Fee",
+            "rate": "Rate",
+            "noConversion": "No conversion",
+            "total": "Total debit"
+        },
+        "resultTitle": "Transfer requested",
+        "again": "New transfer"
     },
     "convert": {
-        "created": "Conversion request created",
         "from": "From account",
         "chooseAccount": "Choose account",
         "amount": "Amount",
         "to": "To currency",
         "chooseCurrency": "Choose currency",
-        "quote": "Quote",
-        "quoteHint": "Choose an account, a target currency and an amount to see the quote.",
+        "estimated": "Amount",
+        "mode": "Direction",
+        "modeLabel": "{from} → {to}",
+        "youSend": "You send",
+        "youReceive": "You receive",
+        "swap": "Swap currencies",
+        "max": "MAX",
+        "noSource": "No account of this type",
+        "rateInfo": "Exchange rate",
         "rate": "Rate",
-        "fee": "Fee",
+        "fee": "Fee (spread)",
         "totalDebit": "Total debit",
-        "youGet": "You get",
-        "reviewNotice": "The quoted rate is locked when the request is created.",
-        "submit": "Create conversion"
+        "source": "Source",
+        "sourceName": "Demo rates feed",
+        "sourceValue": "Demo rates feed · updated {time} (UTC), refreshes every 30 s",
+        "ratesError": "Could not load rates.",
+        "retry": "Retry",
+        "quoteHint": "Choose an account, a target currency and an amount to see the rate.",
+        "reviewNotice": "The final amount is calculated by the server from a locked quote, not from these figures.",
+        "submit": "Convert now",
+        "quoteTitle": "Locked quote",
+        "quoteDescription": "The rate is fixed for a short time. Confirm before the timer runs out.",
+        "quoteExpiresIn": "Quote expires in {seconds} s",
+        "quoteRefreshing": "Quote expired — requesting a new one…",
+        "quoteTimer": "Time left on the quote",
+        "confirm": "Confirm conversion",
+        "resultTitle": "Conversion requested",
+        "again": "New conversion"
     },
     "verification": {
         "statusTitle": "Verification status",
         "statusText": {
-            "none": "You have not submitted verification yet.",
+            "none": "You have not submitted verification yet. Money operations unlock after approval.",
             "pending": "Your documents are under review.",
-            "approved": "Your identity is verified. All operations are available.",
-            "rejected": "Verification was rejected. You can submit it again."
+            "approved": "Verification approved — full access to all operations.",
+            "rejected": "Verification was rejected. Check the reason and submit again."
         },
         "rejectionReason": "Reason: {reason}",
         "submittedAt": "Submitted {date}",
@@ -400,8 +559,9 @@
         "stepN": "Step {n}",
         "steps": {
             "personal": "Personal data",
-            "address": "Address",
-            "document": "Document"
+            "document": "Document",
+            "selfie": "Selfie",
+            "address": "Proof of address"
         },
         "fields": {
             "firstName": "First name",
@@ -415,7 +575,14 @@
             "documentType": "Document type",
             "documentNumber": "Document number",
             "files": "Document files",
-            "filesHint": "PNG, JPEG or PDF, up to 5 MB, max 3 files. Stored in memory only."
+            "filesHint": "PNG, JPEG or PDF, up to 10 MB.",
+            "photoPage": "Photo page",
+            "front": "Front side",
+            "back": "Back side",
+            "selfie": "Selfie",
+            "selfieHint": "PNG or JPEG, up to 10 MB. Face clearly visible, no glasses or hat.",
+            "proof": "Proof of address",
+            "proofHint": "Utility bill or bank statement, not older than 3 months. PNG, JPEG or PDF, up to 10 MB."
         },
         "countries": {
             "DE": "Country A",
@@ -434,62 +601,150 @@
         },
         "back": "Back",
         "next": "Next",
-        "submit": "Submit for review"
+        "submit": "Submit for review",
+        "expectedTime": "Review usually takes 1–2 business days (demo: an administrator approves it).",
+        "resubmit": "Submit again",
+        "providerNote": "In production this flow would be run by an identity-verification provider SDK. Demo: files stay in this browser tab's memory.",
+        "selfieText": "Take a selfie holding nothing in front of your face. A liveness check would run here with a real provider.",
+        "upload": {
+            "choose": "Choose a file",
+            "uploading": "Uploading…",
+            "uploaded": "Uploaded",
+            "progress": "Upload progress of {name}",
+            "preview": "Preview of {name}",
+            "remove": "Remove {name}"
+        }
     },
     "credit": {
         "formTitle": "Credit application",
         "created": "Application submitted",
+        "stepOf": "Step {n} of {total}",
+        "steps": {
+            "loan": "Loan details",
+            "financial": "Financial info",
+            "review": "Review & submit"
+        },
         "fields": {
-            "currency": "Currency",
             "choose": "Choose…",
             "amount": "Amount",
-            "term": "Term",
+            "term": "Term (months)",
             "purpose": "Purpose",
+            "employment": "Employment",
             "income": "Monthly income",
+            "obligations": "Current monthly obligations",
             "date": "Date",
             "status": "Status",
             "reason": "Reason"
         },
+        "amountHint": "From {min} to {max}",
+        "termHint": "From {min} to {max} months",
+        "obligationsHint": "Other loans, leases, etc. Enter 0 if none.",
         "months": "{count, plural, one {# month} other {# months}}",
         "purposes": {
-            "personal": "Personal",
-            "education": "Education",
             "business": "Business",
+            "realEstate": "Real estate",
+            "vehicle": "Vehicle",
+            "education": "Education",
+            "medical": "Medical",
+            "homeRenovation": "Home renovation",
+            "debtConsolidation": "Debt consolidation",
+            "travel": "Travel",
             "other": "Other"
         },
-        "submit": "Apply",
+        "employment": {
+            "employed": "Employed",
+            "selfEmployed": "Self-employed",
+            "unemployed": "Unemployed",
+            "retired": "Retired",
+            "student": "Student"
+        },
+        "estimate": {
+            "title": "Preliminary estimate",
+            "perMonth": "≈ {amount} / month",
+            "note": "Preliminary calculation at an indicative APR of {apr}%. Not an offer: the final rate and payment are set after review."
+        },
+        "consent": "I confirm the information is accurate and agree to the (placeholder) credit terms.",
+        "back": "Back",
+        "next": "Next",
+        "submit": "Submit application",
         "listTitle": "My applications",
-        "empty": "No applications yet"
+        "empty": "No applications yet",
+        "statuses": {
+            "underReview": "Under review",
+            "approved": "Approved",
+            "declined": "Declined"
+        }
     },
     "cards": {
-        "formTitle": "Order a card",
-        "created": "Card order created",
-        "fields": {
-            "type": "Card type",
-            "tier": "Tier",
-            "account": "Linked account",
-            "choose": "Choose…",
-            "deliveryAddress": "Delivery address",
-            "date": "Date",
-            "status": "Status"
+        "created": "Plan change requested. The price is held and charged once approved.",
+        "plansTitle": "Card plans",
+        "benefitsTitle": "Benefits",
+        "plans": {
+            "basic": "Plan 1",
+            "plus": "Plan 2",
+            "premium": "Plan 3",
+            "elite": "Plan 4"
         },
-        "types": {
-            "virtual": "Virtual",
-            "physical": "Physical"
+        "popular": "Popular",
+        "current": "Current",
+        "pending": "Awaiting approval",
+        "free": "Free",
+        "billing": {
+            "monthly": "{price} / month",
+            "yearly": "{price} / year"
         },
-        "tiers": {
-            "standard": {
-                "name": "Tier 1",
-                "text": "Tier description placeholder"
+        "billingType": {
+            "free": "No fee",
+            "monthly": "Billed monthly",
+            "yearly": "Billed yearly"
+        },
+        "features": {
+            "dailyLimit": "Daily limit",
+            "atmLimit": "ATM limit",
+            "support": "Support",
+            "cashback": "Cashback"
+        },
+        "support": {
+            "standard": "Standard",
+            "priority": "Priority",
+            "dedicated": "Dedicated"
+        },
+        "extras": {
+            "virtualCard": "Virtual card",
+            "freeFx": "Reduced conversion fee",
+            "travelInsurance": "Travel insurance (placeholder)",
+            "loungeAccess": "Lounge access (placeholder)"
+        },
+        "select": "Select",
+        "currentButton": "Current plan",
+        "included": "Included",
+        "dialog": {
+            "title": "Switch to {plan}",
+            "description": "Compare with your current plan and confirm the payment.",
+            "comparison": "Plan comparison",
+            "total": "Total price",
+            "payFrom": "Pay from",
+            "chooseAccount": "Choose account",
+            "noFunds": "No {currency} account has enough available funds.",
+            "chargeNote": "Held now, charged in a single ledger entry when approved.",
+            "confirm": "Confirm and pay"
+        },
+        "benefits": {
+            "security": {
+                "title": "Secure by design",
+                "text": "Placeholder text about card security features."
             },
-            "premium": {
-                "name": "Tier 2",
-                "text": "Tier description placeholder"
+            "global": {
+                "title": "Use it anywhere",
+                "text": "Placeholder text about paying in many currencies."
+            },
+            "instant": {
+                "title": "Instant control",
+                "text": "Placeholder text about freezing and managing the card."
             }
         },
-        "submit": "Order card",
-        "listTitle": "My card orders",
-        "empty": "No card orders yet"
+        "planLabel": "Card plan",
+        "networkMark": "DEMO"
     },
     "support": {
         "formTitle": "New ticket",
@@ -525,26 +780,90 @@
         "copied": "Copied"
     },
     "settings": {
-        "save": "Save",
-        "saved": "Saved",
-        "profile": {
-            "title": "Profile",
-            "description": "Your personal data",
-            "name": "Full name",
-            "email": "Email"
+        "avatar": {
+            "title": "Profile photo",
+            "description": "Shown in the sidebar",
+            "upload": "Upload photo",
+            "change": "Change photo",
+            "remove": "Remove",
+            "choose": "Choose a photo",
+            "preview": "Cropped photo preview",
+            "zoom": "Zoom",
+            "horizontal": "Horizontal position",
+            "vertical": "Vertical position",
+            "save": "Save photo",
+            "saved": "Photo updated",
+            "removed": "Photo removed",
+            "hint": "JPG, PNG or WEBP, up to 5 MB. Without a photo your initials are shown."
         },
         "password": {
-            "title": "Password",
+            "title": "Change password",
             "description": "Demo: the new password is validated but not stored",
-            "changed": "Password changed",
+            "changed": "Password changed. Other sessions were signed out.",
             "current": "Current password",
             "new": "New password",
             "confirm": "Confirm new password",
-            "submit": "Change password"
+            "submit": "Change password",
+            "strength": "Strength",
+            "levels": {
+                "weak": "Weak",
+                "fair": "Fair",
+                "strong": "Strong"
+            },
+            "rules": {
+                "length": "At least 8 characters",
+                "mixedCase": "Upper- and lowercase letters",
+                "digit": "A number",
+                "symbol": "A symbol"
+            },
+            "met": "(met)",
+            "notMet": "(not met)"
+        },
+        "security": {
+            "title": "Security",
+            "description": "Two-factor authentication and active sessions"
+        },
+        "twoFactor": {
+            "title": "Two-factor authentication",
+            "description": "Confirm sign-ins and money operations with an authenticator app.",
+            "on": "On",
+            "off": "Off",
+            "enable": "Enable",
+            "disable": "Disable",
+            "scan": "Scan the QR code with an authenticator app or enter the key manually, then type the code it shows.",
+            "secret": "Setup key",
+            "code": "Authenticator code",
+            "demoHint": "Demo: any 6 digits are accepted.",
+            "confirmEnable": "Enable 2FA",
+            "confirmDisable": "Disable 2FA",
+            "enabledToast": "Two-factor authentication enabled",
+            "disabledToast": "Two-factor authentication disabled"
+        },
+        "sessions": {
+            "title": "Active sessions",
+            "empty": "No active sessions",
+            "current": "This device",
+            "lastActive": "Last active {date}",
+            "signOut": "Sign out",
+            "ended": "Session ended"
+        },
+        "displayCurrency": {
+            "title": "Display currency",
+            "description": "Totals and crypto equivalents are shown in this currency",
+            "label": "Currency",
+            "saved": "Amounts are now shown in {currency}"
+        },
+        "accountInfo": {
+            "title": "Account info",
+            "description": "Read-only",
+            "name": "Full name",
+            "email": "Email",
+            "phone": "Phone",
+            "country": "Country",
+            "changeNote": "To change these details, <link>contact support</link> — changes require re-verification."
         },
         "preferences": {
             "title": "Preferences",
-            "language": "Language",
             "darkTheme": "Dark theme",
             "darkThemeHint": "Use the dark color scheme"
         }
@@ -576,7 +895,21 @@
             },
             "loading": "Loading requests",
             "empty": "No requests match the filters",
-            "actions": "Actions"
+            "actions": "Actions",
+            "rail": "Rail",
+            "rails": {
+                "sepa": "SEPA",
+                "wire": "Wire",
+                "card": "Card"
+            },
+            "beneficiary": "Beneficiary",
+            "bankAddress": "Bank",
+            "card": "Card",
+            "reference": "Reference",
+            "product": "Product",
+            "planProduct": "Card plan: {plan}",
+            "physicalCardProduct": "Physical card",
+            "deliveryAddress": "Delivery address"
         },
         "registrations": {
             "views": "Views",
@@ -598,9 +931,6 @@
         },
         "credits": {
             "title": "Credit applications"
-        },
-        "cardOrders": {
-            "title": "Card orders"
         },
         "settings": {
             "currencies": "Currencies & rates",
@@ -899,15 +1229,15 @@
             "channels": {
                 "chat": {
                     "title": "Live chat",
-                    "text": "Chat channel description placeholder."
+                    "text": "Chat with our support team in real-time for immediate assistance."
                 },
                 "email": {
                     "title": "Email",
-                    "text": "Email channel description placeholder."
+                    "text": "Reach out to us via email and we will respond within 24 hours."
                 },
                 "help": {
                     "title": "Help center",
-                    "text": "Help center description placeholder."
+                    "text": "Browse our help center for answers to common questions and detailed guides on using our platform."
                 }
             },
             "faqTitle": "Frequently asked questions",
@@ -966,6 +1296,138 @@
             "account": "Account",
             "disclaimer": "Orion Bank is a fictional demo. It does not provide financial services, process payments or store personal data.",
             "rights": "© {year} Orion Bank demo"
+        }
+    },
+    "totals": {
+        "fiat": "Total fiat balance",
+        "crypto": "Total crypto balance",
+        "available": {
+            "fiat": "Available fiat",
+            "crypto": "Available crypto"
+        },
+        "inDisplay": "In {currency}",
+        "atRates": "In {currency} at current rates"
+    },
+    "deposit": {
+        "currency": "Currency",
+        "chooseCurrency": "Choose currency",
+        "bankDetails": "Transfer to these bank details",
+        "beneficiary": "Beneficiary",
+        "accountNumber": "Account number",
+        "bankCode": "Bank code",
+        "reference": "Payment reference",
+        "referenceNote": "Include the reference so the transfer can be matched to your account. Demo details — do not send real money.",
+        "checkoutText": "You will continue to the card payment provider. Card details are entered there and never reach this app.",
+        "address": "Deposit address",
+        "networkNote": "Send only on the {network} network.",
+        "confirmations": "Credited after {count, plural, one {# network confirmation} other {# network confirmations}}.",
+        "webhookNote": "Deposits are credited automatically when the network confirms them — no button needed.",
+        "networks": {
+            "bitcoin": "Bitcoin",
+            "ethereum": "Ethereum",
+            "tron": "Tron",
+            "solana": "Solana"
+        },
+        "instructionsError": "Could not load the deposit details.",
+        "retry": "Retry",
+        "submitSent": "I've sent the transfer",
+        "submitCheckout": "Continue to payment",
+        "submitSimulate": "Simulate incoming transfer (demo)",
+        "checkoutTitle": "Payment provider (demo)",
+        "checkoutDescription": "In production you would be redirected to the provider's checkout. No payment is made in the demo.",
+        "checkoutPay": "Pay (demo)",
+        "resultTitle": "Deposit registered",
+        "again": "New deposit"
+    },
+    "withdraw": {
+        "currency": "Currency / account",
+        "recipient": "Recipient",
+        "recipientGets": "Recipient gets",
+        "processing": "Expected processing time: {min, plural, =0 {same day} other {# days}} – {max, plural, one {# business day} other {# business days}}.",
+        "confirmTitle": "Confirm withdrawal",
+        "resultTitle": "Withdrawal requested",
+        "again": "New withdrawal"
+    },
+    "confirmCode": {
+        "description": {
+            "app": "Enter the 6-digit code from your authenticator app.",
+            "email": "Enter the 6-digit code we sent to your email."
+        },
+        "label": "Confirmation code",
+        "demoHint": "Demo: nothing is sent — any 6 digits are accepted.",
+        "submit": "Confirm"
+    },
+    "requestResult": {
+        "pendingText": "The request is pending review. Funds are reserved until it is approved or rejected.",
+        "reference": "Request ID",
+        "viewTransaction": "View transaction"
+    },
+    "about": {
+        "hero": {
+            "title": "One wallet for fiat and crypto",
+            "subtitle": "Placeholder subtitle describing the demo multi-currency wallet.",
+            "cta": "Make a deposit"
+        },
+        "advantages": {
+            "title": "Why this wallet",
+            "multiCurrency": {
+                "title": "Multi-currency",
+                "text": "Placeholder text about holding several currencies."
+            },
+            "security": {
+                "title": "Security",
+                "text": "Placeholder text about account protection."
+            },
+            "speed": {
+                "title": "Speed",
+                "text": "Placeholder text about fast operations."
+            },
+            "support": {
+                "title": "Support",
+                "text": "Placeholder text about customer support."
+            }
+        },
+        "services": {
+            "title": "Services",
+            "accounts": {
+                "title": "Fiat accounts",
+                "text": "Placeholder text about fiat accounts."
+            },
+            "crypto": {
+                "title": "Crypto wallets",
+                "text": "Placeholder text about crypto wallets."
+            },
+            "transfers": {
+                "title": "Transfers",
+                "text": "Placeholder text about transfers."
+            },
+            "conversion": {
+                "title": "Conversion",
+                "text": "Placeholder text about currency conversion."
+            },
+            "cards": {
+                "title": "Cards",
+                "text": "Placeholder text about cards."
+            },
+            "credit": {
+                "title": "Credit",
+                "text": "Placeholder text about credit."
+            }
+        },
+        "license": {
+            "title": "Licence and regulation",
+            "number": "Licence number",
+            "regulator": "Regulator",
+            "registry": "View in the public registry"
+        },
+        "metrics": {
+            "title": "Key figures"
+        },
+        "cta": {
+            "title": "Ready to start?",
+            "text": "Placeholder call to action text.",
+            "button": "Open dashboard",
+            "support": "Contact support"
         }
     }
 }

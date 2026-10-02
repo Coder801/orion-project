@@ -120,7 +120,11 @@ function KycDetails({
     const t = useTranslations("admin.registrations");
     const tv = useTranslations("verification");
     const language = useLocale();
-    const { personal, address, document } = submission;
+    const { personal, address, document, selfie } = submission;
+    const fileList = (files: { name: string; size: number }[]) =>
+        files
+            .map((f) => `${f.name} (${formatBytes(f.size, language)})`)
+            .join(", ");
     return (
         <DetailList
             items={[
@@ -141,15 +145,9 @@ function KycDetails({
                     tv(`documentTypes.${document.type}`),
                 ],
                 [tv("fields.documentNumber"), document.number],
-                [
-                    tv("fields.files"),
-                    document.files
-                        .map(
-                            (f) =>
-                                `${f.name} (${formatBytes(f.size, language)})`,
-                        )
-                        .join(", "),
-                ],
+                [tv("fields.files"), fileList(document.files)],
+                [tv("fields.selfie"), fileList([selfie])],
+                [tv("fields.proof"), fileList(address.proof)],
             ]}
         />
     );

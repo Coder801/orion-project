@@ -62,10 +62,40 @@ function RequestDetails({
     items.push([t("fee"), formatMoney(payload.fee, currencyOf(request))]);
     if (request.kind === "transfer") {
         const { target } = request.payload;
+        if (target.kind === "external") {
+            const { beneficiary } = target;
+            items.push(
+                [t("rail"), t(`rails.${target.rail}`)],
+                [t("beneficiary"), beneficiary.name],
+            );
+            if (beneficiary.iban) items.push(["IBAN", beneficiary.iban]);
+            if (beneficiary.bic) items.push(["BIC", beneficiary.bic]);
+            if (beneficiary.bankAddress)
+                items.push([
+                    t("bankAddress"),
+                    `${beneficiary.bankAddress} (${beneficiary.bankCountry ?? ""})`,
+                ]);
+            if (beneficiary.cardLast4)
+                items.push([t("card"), `•••• ${beneficiary.cardLast4}`]);
+            if (target.reference)
+                items.push([t("reference"), target.reference]);
+        } else {
+            items.push([
+                t("target"),
+                target.kind === "own" ? t("ownAccount") : target.email,
+            ]);
+        }
+    }
+    if (request.kind === "card") {
+        const { product } = request.payload;
         items.push([
-            t("target"),
-            target.kind === "own" ? t("ownAccount") : target.email,
+            t("product"),
+            product.kind === "plan"
+                ? t("planProduct", { plan: product.plan })
+                : t("physicalCardProduct"),
         ]);
+        if (product.kind === "physicalCard")
+            items.push([t("deliveryAddress"), product.deliveryAddress]);
     }
     if (request.kind === "deposit" || request.kind === "withdrawal") {
         items.push([t("method"), request.method]);

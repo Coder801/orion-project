@@ -20,6 +20,26 @@ export interface User {
     role: Role;
     kycStatus: KycStatus;
     createdAt: string;
+    phone?: string;
+    /** ISO 3166-1 alpha-2 code or "OTHER". */
+    country?: string;
+    /** Fiat currency used for totals and equivalents; defaults to EUR. */
+    displayCurrency?: CurrencyCode;
+    /** Cropped square avatar as a data URL. */
+    avatar?: string;
+    twoFactorEnabled?: boolean;
+    /** Card plan id; defaults to the cheapest plan. */
+    cardPlan?: string;
+}
+
+export interface Session {
+    id: string;
+    userId: string;
+    /** Placeholder device label, e.g. "Browser · Desktop". */
+    device: string;
+    createdAt: string;
+    lastActiveAt: string;
+    revokedAt?: string;
 }
 
 export interface Currency {
@@ -39,7 +59,7 @@ export interface Account {
 }
 
 export type TransactionType =
-    "deposit" | "withdrawal" | "transfer" | "conversion";
+    "deposit" | "withdrawal" | "transfer" | "conversion" | "card";
 export type TransactionStatus = "pending" | "completed" | "failed";
 
 export interface Transaction {
@@ -51,13 +71,16 @@ export interface Transaction {
     amount: Minor;
     currency: CurrencyCode;
     status: TransactionStatus;
+    /** Payment method or rail of the originating request. */
+    method?: string;
     requestId?: string;
     createdAt: string;
 }
 
 // ─── Requests reviewed by an admin ──────────────────────────────────────────
 
-export type RequestKind = "deposit" | "withdrawal" | "transfer" | "conversion";
+export type RequestKind =
+    "deposit" | "withdrawal" | "transfer" | "conversion" | "card";
 export type ReviewStatus = "pending" | "approved" | "rejected";
 export type ReviewDecision = "approved" | "rejected";
 
@@ -70,14 +93,42 @@ export interface MoneyMovementPayload {
     fields: Record<string, string>;
 }
 
+export type TransferRail = "sepa" | "wire" | "card";
+
+/** External recipient. Card numbers never reach the app: only a provider token + last 4. */
+export interface BeneficiaryDetails {
+    name: string;
+    iban?: string;
+    bic?: string;
+    bankAddress?: string;
+    bankCountry?: string;
+    cardToken?: string;
+    cardLast4?: string;
+}
+
+export interface Beneficiary extends BeneficiaryDetails {
+    id: string;
+    userId: string;
+    rail: TransferRail;
+    createdAt: string;
+}
+
+export type TransferTarget =
+    | { kind: "own"; accountId: string }
+    | { kind: "user"; email: string; userId: string }
+    | {
+          kind: "external";
+          rail: TransferRail;
+          beneficiary: BeneficiaryDetails;
+          reference?: string;
+      };
+
 export interface TransferPayload {
     fromAccountId: string;
     currency: CurrencyCode;
     amount: Minor;
     fee: Minor;
-    target:
-        | { kind: "own"; accountId: string }
-        | { kind: "user"; email: string; userId: string };
+    target: TransferTarget;
 }
 
 export interface ConversionPayload {
@@ -92,11 +143,25 @@ export interface ConversionPayload {
     toAmount: Minor;
 }
 
+export type CardProduct =
+    | { kind: "plan"; plan: string }
+    | { kind: "physicalCard"; deliveryAddress: string };
+
+/** Card plan purchase or physical card order, paid from one account. */
+export interface CardPaymentPayload {
+    accountId: string;
+    currency: CurrencyCode;
+    amount: Minor;
+    fee: Minor;
+    product: CardProduct;
+}
+
 export interface RequestPayloadByKind {
     deposit: MoneyMovementPayload;
     withdrawal: MoneyMovementPayload;
     transfer: TransferPayload;
     conversion: ConversionPayload;
+    card: CardPaymentPayload;
 }
 
 export interface Request<T = unknown> {
@@ -134,18 +199,40 @@ export interface KycSubmission {
         birthDate: string;
         country: string;
     };
-    address: { line1: string; city: string; postalCode: string };
+    address: {
+        line1: string;
+        city: string;
+        postalCode: string;
+        /** Utility bill or bank statement. */
+        proof: StoredFile[];
+    };
     document: {
         type: "passport" | "idCard" | "driverLicense";
         number: string;
+        /** Front side first, then the back side if the document has one. */
         files: StoredFile[];
     };
+    selfie: StoredFile;
     status: ReviewStatus;
     reviewedBy?: string;
     reason?: string;
     createdAt: string;
     reviewedAt?: string;
 }
+
+export type CreditPurpose =
+    | "business"
+    | "realEstate"
+    | "vehicle"
+    | "education"
+    | "medical"
+    | "homeRenovation"
+    | "debtConsolidation"
+    | "travel"
+    | "other";
+
+export type EmploymentStatus =
+    "employed" | "selfEmployed" | "unemployed" | "retired" | "student";
 
 export interface CreditApplication {
     id: string;
@@ -153,25 +240,10 @@ export interface CreditApplication {
     amount: Minor;
     currency: CurrencyCode;
     termMonths: number;
-    purpose: "personal" | "education" | "business" | "other";
+    purpose: CreditPurpose;
+    employment: EmploymentStatus;
     monthlyIncome: Minor;
-    status: ReviewStatus;
-    reviewedBy?: string;
-    reason?: string;
-    createdAt: string;
-    reviewedAt?: string;
-}
-
-export type CardType = "virtual" | "physical";
-export type CardTier = "standard" | "premium";
-
-export interface CardOrder {
-    id: string;
-    userId: string;
-    type: CardType;
-    tier: CardTier;
-    accountId: string;
-    deliveryAddress?: string;
+    monthlyObligations: Minor;
     status: ReviewStatus;
     reviewedBy?: string;
     reason?: string;
@@ -193,7 +265,7 @@ export interface SupportTicket {
 }
 
 /** Entities whose status changes are reported to the user and audited. */
-export type ReviewEntity = "request" | "kyc" | "credit" | "cardOrder";
+export type ReviewEntity = "request" | "kyc" | "credit";
 
 export type NotificationSubject =
     RequestKind | Exclude<ReviewEntity, "request">;
@@ -260,10 +332,54 @@ export interface FeeSettings {
     transferBps: number;
 }
 
+/** Per-operation amount limits in major units of the currency. */
+export interface AmountLimits {
+    min: DecimalString;
+    max: DecimalString;
+}
+
+export type CardSupportLevel = "standard" | "priority" | "dedicated";
+export type CardBilling = "free" | "monthly" | "yearly";
+
+export interface CardPlan {
+    id: string;
+    /** Higher rank = higher plan; downgrades are not allowed. */
+    rank: number;
+    price: Minor;
+    currency: CurrencyCode;
+    billing: CardBilling;
+    popular?: boolean;
+    dailyLimit: Minor;
+    atmLimit: Minor;
+    support: CardSupportLevel;
+    cashbackBps: number;
+    /** Keys under `cards.extras.*`. */
+    extras: string[];
+}
+
+export interface PhysicalCardOffer {
+    price: Minor;
+    currency: CurrencyCode;
+    deliveryDays: { min: number; max: number };
+}
+
+export interface CreditSettings {
+    currency: CurrencyCode;
+    limits: AmountLimits;
+    termMonths: { min: number; max: number };
+    /** Indicative annual rate for the preliminary payment estimate. */
+    aprBps: number;
+}
+
 export interface PlatformSettings {
     currencies: Currency[];
     methods: PaymentMethod[];
     /** Price of one unit of each currency in the pivot currency (USD). */
     usdPrices: Record<CurrencyCode, DecimalString>;
     fees: FeeSettings;
+    /** Deposit, withdrawal and external transfer limits per currency. */
+    limits: Record<CurrencyCode, AmountLimits>;
+    cardPlans: CardPlan[];
+    physicalCard: PhysicalCardOffer;
+    credit: CreditSettings;
 }

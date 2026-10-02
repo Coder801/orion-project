@@ -120,14 +120,22 @@ export function buildFieldsSchema(
             continue;
         }
         const validator = FIELD_VALIDATORS[field.kind];
-        let schema: z.ZodType<string, string> = requiredString();
-        if (validator)
-            schema = requiredString().refine(validator[0], {
-                error: validator[1],
-            });
-        shape[field.name] = field.optional
-            ? z.string().trim().max(140)
-            : schema;
+        if (field.optional) {
+            // Optional fields may stay empty, but a filled one must be valid.
+            shape[field.name] = validator
+                ? z
+                      .string()
+                      .trim()
+                      .max(140)
+                      .refine((v) => v === "" || validator[0](v), {
+                          error: validator[1],
+                      })
+                : z.string().trim().max(140);
+            continue;
+        }
+        shape[field.name] = validator
+            ? requiredString().refine(validator[0], { error: validator[1] })
+            : requiredString();
     }
 
     const networkField = fields.find((f) => f.kind === "network");

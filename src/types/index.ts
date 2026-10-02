@@ -8,4 +8,6 @@ export interface SessionUser {
     email: string;
     name: string;
     role: Role;
+    /** Server-side session id (mock); lets the user see and revoke sessions. */
+    sessionId?: string;
 }

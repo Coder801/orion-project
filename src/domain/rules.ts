@@ -7,6 +7,7 @@ import type {
     CurrencyCode,
     Minor,
     PlatformSettings,
+    TransferRail,
     User,
 } from "@/domain/types";
 
@@ -44,7 +45,12 @@ export function hasAvailable(
 }
 
 /** Kinds that take money out of an account and therefore hold funds while pending. */
-export const DEBIT_KINDS = ["withdrawal", "transfer", "conversion"] as const;
+export const DEBIT_KINDS = [
+    "withdrawal",
+    "transfer",
+    "conversion",
+    "card",
+] as const;
 
 export type DebitRequest = Extract<
     AnyRequest,
@@ -80,4 +86,10 @@ export function requireEnabledCurrency(
     const currency = findCurrency(settings, code);
     if (!currency?.enabled) throw new DomainError("currencyDisabled");
     return currency;
+}
+
+/** External rails are fiat-only, and SEPA is euro-only. */
+export function railSupports(rail: TransferRail, currency: Currency): boolean {
+    if (currency.type !== "fiat") return false;
+    return rail !== "sepa" || currency.code === "EUR";
 }

@@ -37,3 +37,31 @@ export function accountLabel(
 ): string {
     return `${account.currency} ·· ${hashDigits(account.id, 16).slice(-4)}`;
 }
+
+/** Placeholder platform bank details the user pays a fiat deposit to. */
+export function depositBankDetailsFor(currency: string) {
+    return {
+        beneficiary: "DEMO BENEFICIARY",
+        accountNumber: `DEMO ${hashDigits(`platform:${currency}`, 12).match(/.{4}/g)?.join(" ")}`,
+        bankCode: `DEMO${hashDigits(`platform:${currency}:bank`, 4)}`,
+    };
+}
+
+/** Unique reference that matches an incoming bank transfer to the user. */
+export function depositReferenceFor(userId: string, currency: string): string {
+    return `DEMO-${currency}-${hashDigits(`${userId}:${currency}:ref`, 8)}`;
+}
+
+/** Placeholder deposit address per user, currency and network. */
+export function depositAddressFor(
+    userId: string,
+    currency: string,
+    network: string,
+): string {
+    return `demo:${network}:${hashDigits(`${userId}:${currency}:${network}`, 32)}`;
+}
+
+/** Placeholder card number tail for a user's card widget. */
+export function cardLast4For(userId: string): string {
+    return hashDigits(`${userId}:card`, 4);
+}

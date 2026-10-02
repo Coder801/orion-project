@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/Label";
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/Select";
@@ -71,6 +73,8 @@ interface TextFieldProps extends ComponentProps<"input">, FieldOwnProps {
     /** Decorative content inside the field, e.g. a currency sign. */
     startAdornment?: ReactNode;
     endAdornment?: ReactNode;
+    /** Interactive control inside the field's right edge, e.g. a MAX button. */
+    endAction?: ReactNode;
     containerClassName?: string;
 }
 
@@ -81,6 +85,7 @@ function TextField({
     error,
     startAdornment,
     endAdornment,
+    endAction,
     className,
     containerClassName,
     ...props
@@ -107,14 +112,20 @@ function TextField({
                     className={cn(
                         startAdornment && "pl-9",
                         endAdornment && "pr-16",
+                        endAction && "pr-32",
                         className,
                     )}
                     {...fieldAria(id, { hint, error })}
                     {...props}
                 />
-                {endAdornment && (
-                    <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-sm font-medium text-muted-foreground">
-                        {endAdornment}
+                {(endAdornment || endAction) && (
+                    <span className="absolute inset-y-0 right-4 flex items-center gap-2">
+                        {endAction}
+                        {endAdornment && (
+                            <span className="pointer-events-none text-sm font-medium text-muted-foreground">
+                                {endAdornment}
+                            </span>
+                        )}
                     </span>
                 )}
             </div>
@@ -154,6 +165,18 @@ export interface SelectOption {
     value: string;
     label: string;
     disabled?: boolean;
+    /** Options sharing a group label are listed under it, in first-seen order. */
+    group?: string;
+}
+
+function groupOptions(options: SelectOption[]) {
+    const groups = new Map<string | undefined, SelectOption[]>();
+    for (const option of options) {
+        const list = groups.get(option.group) ?? [];
+        list.push(option);
+        groups.set(option.group, list);
+    }
+    return [...groups];
 }
 
 interface SelectFieldProps extends FieldOwnProps {
@@ -220,15 +243,25 @@ function SelectField({
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
                 <SelectContent>
-                    {options.map((option) => (
-                        <SelectItem
-                            key={option.value}
-                            value={option.value}
-                            disabled={option.disabled}
-                        >
-                            {option.label}
-                        </SelectItem>
-                    ))}
+                    {groupOptions(options).map(([group, items]) => {
+                        const rendered = items.map((option) => (
+                            <SelectItem
+                                key={option.value}
+                                value={option.value}
+                                disabled={option.disabled}
+                            >
+                                {option.label}
+                            </SelectItem>
+                        ));
+                        return group === undefined ? (
+                            rendered
+                        ) : (
+                            <SelectGroup key={group}>
+                                <SelectLabel>{group}</SelectLabel>
+                                {rendered}
+                            </SelectGroup>
+                        );
+                    })}
                 </SelectContent>
             </Select>
         </Field>

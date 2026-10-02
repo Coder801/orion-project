@@ -1,46 +1,86 @@
 import { z } from "zod";
+import { cmpMinor, decimalToMinor } from "@/domain/money";
+import type {
+    CreditPurpose,
+    CreditSettings,
+    EmploymentStatus,
+} from "@/domain/types";
 import { amountSchema, requiredString } from "@/lib/validation";
 
-export const CREDIT_TERMS = [6, 12, 24, 36] as const;
 export const CREDIT_PURPOSES = [
-    "personal",
-    "education",
     "business",
+    "realEstate",
+    "vehicle",
+    "education",
+    "medical",
+    "homeRenovation",
+    "debtConsolidation",
+    "travel",
     "other",
-] as const;
+] as const satisfies readonly CreditPurpose[];
 
-// Credits are fiat-only and every fiat currency has 2 decimals.
-export const creditSchema = z.object({
-    currency: requiredString(),
-    amount: amountSchema(2),
-    termMonths: z.coerce
-        .number<string>()
-        .refine((v) => (CREDIT_TERMS as readonly number[]).includes(v), {
-            error: "required",
-        }),
-    purpose: z.enum(CREDIT_PURPOSES, { error: "required" }),
+export const EMPLOYMENT_STATUSES = [
+    "employed",
+    "selfEmployed",
+    "unemployed",
+    "retired",
+    "student",
+] as const satisfies readonly EmploymentStatus[];
+
+/** Wizard step 1; limits come from platform settings (credits are 2-decimal fiat). */
+export function loanDetailsSchema(credit: CreditSettings) {
+    return z.object({
+        amount: amountSchema(2).refine(
+            (value) => {
+                try {
+                    const amount = decimalToMinor(value, 2);
+                    return (
+                        cmpMinor(
+                            amount,
+                            decimalToMinor(credit.limits.min, 2),
+                        ) >= 0 &&
+                        cmpMinor(
+                            amount,
+                            decimalToMinor(credit.limits.max, 2),
+                        ) <= 0
+                    );
+                } catch {
+                    return true;
+                }
+            },
+            { error: "amountOutOfRange" },
+        ),
+        purpose: z.enum(CREDIT_PURPOSES, { error: "required" }),
+        termMonths: z
+            .string()
+            .trim()
+            .regex(/^\d+$/, { error: "termRange" })
+            .refine(
+                (v) =>
+                    Number(v) >= credit.termMonths.min &&
+                    Number(v) <= credit.termMonths.max,
+                { error: "termRange" },
+            ),
+    });
+}
+
+const optionalMoney = z
+    .string()
+    .trim()
+    .regex(/^\d+(\.\d{1,2})?$/, { error: "amountFormat" });
+
+export const financialInfoSchema = z.object({
+    employment: z.enum(EMPLOYMENT_STATUSES, { error: "required" }),
     monthlyIncome: amountSchema(2),
+    monthlyObligations: optionalMoney,
 });
 
-export type CreditFormInput = z.input<typeof creditSchema>;
-export type CreditValues = z.output<typeof creditSchema>;
+export const reviewSchema = z.object({
+    consent: z.literal(true, { error: "consent" }),
+});
 
-export const CARD_TYPES = ["virtual", "physical"] as const;
-export const CARD_TIERS = ["standard", "premium"] as const;
-
-export const cardOrderSchema = z
-    .object({
-        type: z.enum(CARD_TYPES),
-        tier: z.enum(CARD_TIERS),
-        accountId: requiredString(),
-        deliveryAddress: z.string().trim().max(200),
-    })
-    .refine((v) => v.type === "virtual" || v.deliveryAddress.length > 0, {
-        error: "required",
-        path: ["deliveryAddress"],
-    });
-
-export type CardOrderValues = z.infer<typeof cardOrderSchema>;
+export type LoanDetailsValues = z.infer<ReturnType<typeof loanDetailsSchema>>;
+export type FinancialInfoValues = z.infer<typeof financialInfoSchema>;
 
 export const TICKET_CATEGORIES = [
     "account",

@@ -4,10 +4,9 @@ import type { ReviewInput } from "@/domain/audit";
 import { DomainError } from "@/domain/errors";
 import { applyRequest } from "@/domain/ledger";
 import { parseDecimal } from "@/domain/money";
-import { reviewCardOrder, reviewCredit, reviewKyc } from "@/domain/review";
+import { reviewCredit, reviewKyc } from "@/domain/review";
 import type {
     AnyRequest,
-    CardOrder,
     CreditApplication,
     KycSubmission,
     PlatformSettings,
@@ -46,9 +45,6 @@ export const listCreditApplications = (
 ): Promise<CreditApplication[]> =>
     asAdmin(adminId, (repo) => repo.credits.list().sort(byNewest));
 
-export const listAllCardOrders = (adminId: string): Promise<CardOrder[]> =>
-    asAdmin(adminId, (repo) => repo.cardOrders.list().sort(byNewest));
-
 export const reviewRequestAsAdmin = (input: ReviewInput) =>
     asAdmin(input.adminId, (repo) => applyRequest(repo, input).request);
 
@@ -57,9 +53,6 @@ export const reviewKycAsAdmin = (input: ReviewInput) =>
 
 export const reviewCreditAsAdmin = (input: ReviewInput) =>
     asAdmin(input.adminId, (repo) => reviewCredit(repo, input).item);
-
-export const reviewCardOrderAsAdmin = (input: ReviewInput) =>
-    asAdmin(input.adminId, (repo) => reviewCardOrder(repo, input).item);
 
 export function updatePlatformSettings(
     adminId: string,

@@ -6,6 +6,13 @@ export const ROUTES = {
     signUp: "/auth/sign-up",
     forgotPassword: "/auth/forgot-password",
     dashboard: "/app/dashboard",
+    transactions: "/app/transactions",
+    deposit: "/app/deposit",
+    withdraw: "/app/withdraw",
+    transfer: "/app/transfer",
+    cards: "/app/cards",
+    support: "/app/support",
+    settings: "/app/settings",
     verification: "/app/verification",
     adminHome: "/admin/registrations",
 } as const;
@@ -41,4 +48,9 @@ export function redirectFor(
         if (area === "app" && role === "admin") return ROUTES.adminHome;
     }
     return null;
+}
+
+/** Transaction history focused on the entries of one request. */
+export function transactionsFor(requestId: string): string {
+    return `${ROUTES.transactions}?request=${encodeURIComponent(requestId)}`;
 }

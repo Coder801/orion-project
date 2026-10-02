@@ -30,6 +30,11 @@ export const VALIDATION_KEYS = [
     "bps",
     "sameAccount",
     "sameCurrency",
+    "amountOutOfRange",
+    "termRange",
+    "consent",
+    "code",
+    "passwordWeak",
 ] as const;
 
 export type ValidationKey = (typeof VALIDATION_KEYS)[number];
@@ -71,3 +76,27 @@ export function amountSchema(decimals: number) {
             )
     );
 }
+
+/** Complexity rules shown next to a new password; all must pass. */
+export const PASSWORD_RULES = {
+    length: (v: string) => v.length >= 8,
+    mixedCase: (v: string) => /[a-z]/.test(v) && /[A-Z]/.test(v),
+    digit: (v: string) => /\d/.test(v),
+    symbol: (v: string) => /[^A-Za-z0-9]/.test(v),
+} as const;
+
+export type PasswordRule = keyof typeof PASSWORD_RULES;
+
+export function passwordChecks(value: string): Record<PasswordRule, boolean> {
+    return Object.fromEntries(
+        Object.entries(PASSWORD_RULES).map(([rule, check]) => [
+            rule,
+            check(value),
+        ]),
+    ) as Record<PasswordRule, boolean>;
+}
+
+export const strongPasswordSchema = passwordSchema.refine(
+    (v) => Object.values(passwordChecks(v)).every(Boolean),
+    { error: "passwordWeak" },
+);

@@ -3,11 +3,12 @@ import type {
     Account,
     AnyRequest,
     AuditEntry,
-    CardOrder,
+    Beneficiary,
     CreditApplication,
     KycSubmission,
     Notification,
     PlatformSettings,
+    Session,
     SupportTicket,
     Transaction,
     User,
@@ -22,7 +23,8 @@ export interface DbState {
     requests: AnyRequest[];
     kyc: KycSubmission[];
     credits: CreditApplication[];
-    cardOrders: CardOrder[];
+    beneficiaries: Beneficiary[];
+    sessions: Session[];
     tickets: SupportTicket[];
     notifications: Notification[];
     audit: AuditEntry[];
@@ -51,7 +53,8 @@ export class MockRepository implements Repository {
     readonly requests: Collection<AnyRequest>;
     readonly kyc: Collection<KycSubmission>;
     readonly credits: Collection<CreditApplication>;
-    readonly cardOrders: Collection<CardOrder>;
+    readonly beneficiaries: Collection<Beneficiary>;
+    readonly sessions: Collection<Session>;
     readonly tickets: Collection<SupportTicket>;
     readonly notifications: Collection<Notification>;
     readonly audit: Collection<AuditEntry>;
@@ -69,7 +72,8 @@ export class MockRepository implements Repository {
         this.requests = this.collection("requests");
         this.kyc = this.collection("kyc");
         this.credits = this.collection("credits");
-        this.cardOrders = this.collection("cardOrders");
+        this.beneficiaries = this.collection("beneficiaries");
+        this.sessions = this.collection("sessions");
         this.tickets = this.collection("tickets");
         this.notifications = this.collection("notifications");
         this.audit = this.collection("audit");

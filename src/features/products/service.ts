@@ -1,13 +1,18 @@
 import { getRepository, withLatency } from "@/data/client";
+import type { Repository } from "@/data/repository";
+import { requirePlanUpgrade } from "@/domain/cards";
 import { DomainError } from "@/domain/errors";
-import { decimalToMinor } from "@/domain/money";
+import { submitRequest } from "@/domain/ledger";
+import { cmpMinor, decimalToMinor, ZERO } from "@/domain/money";
 import { requireEnabledCurrency } from "@/domain/rules";
 import type {
-    CardOrder,
-    CardTier,
-    CardType,
+    AnyRequest,
+    CardProduct,
     CreditApplication,
+    CreditPurpose,
     DecimalString,
+    EmploymentStatus,
+    Minor,
     SupportTicket,
 } from "@/domain/types";
 import {
@@ -18,10 +23,11 @@ import {
 
 export interface CreditInput {
     amount: DecimalString;
-    currency: string;
     termMonths: number;
-    purpose: CreditApplication["purpose"];
+    purpose: CreditPurpose;
+    employment: EmploymentStatus;
     monthlyIncome: DecimalString;
+    monthlyObligations: DecimalString;
 }
 
 export function listCredits(userId: string): Promise<CreditApplication[]> {
@@ -39,20 +45,43 @@ export function applyForCredit(
     return withLatency(() => {
         const repo = getRepository();
         requireVerifiedUser(repo, userId);
-        const currency = requireEnabledCurrency(
-            repo.settings.get(),
-            input.currency,
-        );
-        if (currency.type !== "fiat") throw new DomainError("currencyDisabled");
+        const settings = repo.settings.get();
+        const { credit } = settings;
+        const currency = requireEnabledCurrency(settings, credit.currency);
+        const amount = decimalToMinor(input.amount, currency.decimals);
+        if (
+            cmpMinor(
+                amount,
+                decimalToMinor(credit.limits.min, currency.decimals),
+            ) < 0 ||
+            cmpMinor(
+                amount,
+                decimalToMinor(credit.limits.max, currency.decimals),
+            ) > 0
+        ) {
+            throw new DomainError("amountOutOfRange");
+        }
+        if (
+            !Number.isInteger(input.termMonths) ||
+            input.termMonths < credit.termMonths.min ||
+            input.termMonths > credit.termMonths.max
+        ) {
+            throw new DomainError("amountOutOfRange");
+        }
         return repo.credits.insert({
             id: repo.nextId("crd"),
             userId,
-            amount: decimalToMinor(input.amount, currency.decimals),
+            amount,
             currency: currency.code,
             termMonths: input.termMonths,
             purpose: input.purpose,
+            employment: input.employment,
             monthlyIncome: decimalToMinor(
                 input.monthlyIncome,
+                currency.decimals,
+            ),
+            monthlyObligations: decimalToMinor(
+                input.monthlyObligations,
                 currency.decimals,
             ),
             status: "pending",
@@ -61,46 +90,103 @@ export function applyForCredit(
     });
 }
 
-export interface CardOrderInput {
-    type: CardType;
-    tier: CardTier;
-    accountId: string;
-    deliveryAddress?: string;
-}
+// ─── Cards ──────────────────────────────────────────────────────────────────
 
-export function listCardOrders(userId: string): Promise<CardOrder[]> {
-    return withLatency(() =>
-        getRepository()
-            .cardOrders.list((c) => c.userId === userId)
-            .sort(byNewest),
-    );
-}
-
-export function orderCard(
+function hasPendingCardRequest(
+    repo: Repository,
     userId: string,
-    input: CardOrderInput,
-): Promise<CardOrder> {
+    kind: CardProduct["kind"],
+): boolean {
+    return repo.requests
+        .list((r) => r.userId === userId && r.status === "pending")
+        .some((r) => r.kind === "card" && r.payload.product.kind === kind);
+}
+
+function payForCard(
+    repo: Repository,
+    userId: string,
+    accountId: string,
+    price: { amount: Minor; currency: string },
+    product: CardProduct,
+): AnyRequest {
+    const account = repo.accounts.get(accountId);
+    if (!account || account.userId !== userId)
+        throw new DomainError("notFound");
+    if (account.currency !== price.currency)
+        throw new DomainError("currencyMismatch");
+    return submitRequest(repo, {
+        kind: "card",
+        userId,
+        method: product.kind === "plan" ? "card-plan" : "physical-card",
+        payload: {
+            accountId: account.id,
+            currency: account.currency,
+            amount: price.amount,
+            fee: ZERO,
+            product,
+        },
+    });
+}
+
+export interface CardPlanInput {
+    plan: string;
+    accountId: string;
+}
+
+/**
+ * Buys an upgrade: the price is held now and charged in one ledger entry when
+ * an admin approves; the plan switches at the same moment.
+ */
+export function selectCardPlan(
+    userId: string,
+    input: CardPlanInput,
+): Promise<AnyRequest> {
+    return withLatency(() => {
+        const repo = getRepository();
+        const user = requireVerifiedUser(repo, userId);
+        const plan = requirePlanUpgrade(repo.settings.get(), user, input.plan);
+        if (!(cmpMinor(plan.price, ZERO) > 0))
+            throw new DomainError("planUnavailable");
+        if (hasPendingCardRequest(repo, userId, "plan"))
+            throw new DomainError("requestPending");
+        return payForCard(
+            repo,
+            userId,
+            input.accountId,
+            { amount: plan.price, currency: plan.currency },
+            { kind: "plan", plan: plan.id },
+        );
+    });
+}
+
+export interface PhysicalCardInput {
+    accountId: string;
+    deliveryAddress: string;
+}
+
+export function orderPhysicalCard(
+    userId: string,
+    input: PhysicalCardInput,
+): Promise<AnyRequest> {
     return withLatency(() => {
         const repo = getRepository();
         requireVerifiedUser(repo, userId);
-        const account = repo.accounts.get(input.accountId);
-        if (!account || account.userId !== userId)
-            throw new DomainError("notFound");
-        return repo.cardOrders.insert({
-            id: repo.nextId("card"),
+        const address = input.deliveryAddress.trim();
+        if (!address) throw new DomainError("invalidDetails");
+        if (hasPendingCardRequest(repo, userId, "physicalCard"))
+            throw new DomainError("requestPending");
+        const offer = repo.settings.get().physicalCard;
+        return payForCard(
+            repo,
             userId,
-            type: input.type,
-            tier: input.tier,
-            accountId: account.id,
-            deliveryAddress:
-                input.type === "physical"
-                    ? input.deliveryAddress?.trim()
-                    : undefined,
-            status: "pending",
-            createdAt: repo.now(),
-        });
+            input.accountId,
+            { amount: offer.price, currency: offer.currency },
+            { kind: "physicalCard", deliveryAddress: address.slice(0, 200) },
+        );
     });
 }
+
+// ─── Support ────────────────────────────────────────────────────────────────
 
 export type TicketInput = Pick<
     SupportTicket,

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { Logo, LogoMark } from "@/components/Logo";
-import { Avatar, AvatarFallback } from "@/components/ui/Avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import {
     DropdownMenu,
@@ -34,6 +34,7 @@ import { useCurrentUser } from "@/features/auth/session";
 import { useSignOut } from "@/features/auth/useSignOut";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { useMeQuery } from "@/store/api";
 
 export function getInitials(name: string): string {
     return name
@@ -113,6 +114,7 @@ export function AppSidebar({
     const t = useTranslations("layout");
     const pathname = usePathname();
     const user = useCurrentUser();
+    const { data: me } = useMeQuery(user.id);
     const signOut = useSignOut();
     const sections = NAV_SECTIONS[variant];
     const homeHref = sections[0]?.items[0]?.href ?? "/";
@@ -188,6 +190,9 @@ export function AppSidebar({
                             )}
                         >
                             <Avatar className="size-9">
+                                {me?.avatar && (
+                                    <AvatarImage src={me.avatar} alt="" />
+                                )}
                                 <AvatarFallback>
                                     {getInitials(user.name)}
                                 </AvatarFallback>

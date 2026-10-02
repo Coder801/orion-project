@@ -38,6 +38,7 @@ const TRANSACTION_TYPE: Record<RequestKind, TransactionType> = {
     withdrawal: "withdrawal",
     transfer: "transfer",
     conversion: "conversion",
+    card: "card",
 };
 
 function ownAccount(
@@ -80,6 +81,11 @@ function validateTransferTarget(
     draft: NewRequest & { kind: "transfer" },
 ) {
     const { target, fromAccountId, currency } = draft.payload;
+    if (target.kind === "external") {
+        if (!target.beneficiary.name.trim())
+            throw new DomainError("invalidDetails");
+        return;
+    }
     if (target.kind === "own") {
         if (target.accountId === fromAccountId)
             throw new DomainError("sameAccount");
@@ -152,6 +158,7 @@ export function submitRequest(repo: Repository, draft: NewRequest): AnyRequest {
             amount: txAmount,
             currency: sourceCurrency(draft),
             status: "pending",
+            method: request.method,
             requestId: request.id,
             createdAt: request.createdAt,
         });
@@ -185,7 +192,7 @@ function credit(
     repo: Repository,
     account: Account,
     amount: Minor,
-    meta: { type: TransactionType; requestId: string },
+    meta: { type: TransactionType; method: string; requestId: string },
 ): void {
     repo.accounts.update(account.id, {
         balance: addMinor(account.balance, amount),
@@ -198,6 +205,7 @@ function credit(
         amount,
         currency: account.currency,
         status: "completed",
+        method: meta.method,
         requestId: meta.requestId,
         createdAt: repo.now(),
     });
@@ -226,6 +234,8 @@ function approve(repo: Repository, request: AnyRequest): void {
         case "transfer": {
             const { payload } = request;
             settleDebit(repo, payload.fromAccountId, debitOf(request).total);
+            // External rails: the money leaves the platform, nothing to credit.
+            if (payload.target.kind === "external") return;
             const target =
                 payload.target.kind === "own"
                     ? ownAccount(repo, payload.target.accountId, request.userId)
@@ -236,6 +246,7 @@ function approve(repo: Repository, request: AnyRequest): void {
                       );
             credit(repo, target, payload.amount, {
                 type: "transfer",
+                method: request.method,
                 requestId: request.id,
             });
             return;
@@ -246,8 +257,18 @@ function approve(repo: Repository, request: AnyRequest): void {
             const target = ensureAccount(repo, request.userId, payload.to);
             credit(repo, target, payload.toAmount, {
                 type: "conversion",
+                method: request.method,
                 requestId: request.id,
             });
+            return;
+        }
+        case "card": {
+            const { payload } = request;
+            settleDebit(repo, payload.accountId, debitOf(request).total);
+            if (payload.product.kind === "plan")
+                repo.users.update(request.userId, {
+                    cardPlan: payload.product.plan,
+                });
             return;
         }
     }

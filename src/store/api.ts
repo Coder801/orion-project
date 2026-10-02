@@ -2,15 +2,17 @@ import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { ReviewInput } from "@/domain/audit";
 import { isDomainError, type DomainErrorCode } from "@/domain/errors";
 import { MoneyError } from "@/domain/money";
-import type { Quote } from "@/domain/rates";
+import type { LockedQuote, RatesSnapshot } from "@/domain/rates";
 import type {
     Account,
     AnyRequest,
-    CardOrder,
+    Beneficiary,
     CreditApplication,
+    CurrencyCode,
     KycSubmission,
     Notification,
     PlatformSettings,
+    Session,
     SupportTicket,
     Transaction,
     User,
@@ -65,8 +67,10 @@ export const api = createApi({
         "Settings",
         "Kyc",
         "Credit",
-        "CardOrder",
         "Ticket",
+        "Session",
+        "Beneficiary",
+        "Rates",
     ],
     endpoints: (build) => ({
         // ─── Auth ───────────────────────────────────────────────────────────────
@@ -78,6 +82,9 @@ export const api = createApi({
         }),
         requestPasswordReset: build.mutation<null, string>({
             queryFn: () => run(() => auth.requestPasswordReset()),
+        }),
+        signOut: build.mutation<null, { userId: string; sessionId?: string }>({
+            queryFn: (session) => run(() => auth.signOut(session)),
         }),
 
         sendContactMessage: build.mutation<null, ContactValues>({
@@ -109,13 +116,40 @@ export const api = createApi({
             queryFn: (userId) => run(() => user.markNotificationsRead(userId)),
             invalidatesTags: ["Notification"],
         }),
-        updateProfile: build.mutation<User, UserArg<{ name: string }>>({
+        setDisplayCurrency: build.mutation<User, UserArg<CurrencyCode>>({
             queryFn: ({ userId, input }) =>
-                run(() => user.updateProfile(userId, input)),
+                run(() => user.setDisplayCurrency(userId, input)),
             invalidatesTags: ["User"],
         }),
-        changePassword: build.mutation<null, void>({
-            queryFn: () => run(() => user.changePassword()),
+        setAvatar: build.mutation<User, UserArg<string | null>>({
+            queryFn: ({ userId, input }) =>
+                run(() => user.setAvatar(userId, input)),
+            invalidatesTags: ["User"],
+        }),
+        setTwoFactor: build.mutation<
+            User,
+            UserArg<{ enabled: boolean; code: string }>
+        >({
+            queryFn: ({ userId, input }) =>
+                run(() => user.setTwoFactor(userId, input)),
+            invalidatesTags: ["User"],
+        }),
+        sessions: build.query<Session[], string>({
+            queryFn: (userId) => run(() => user.listSessions(userId)),
+            providesTags: ["Session"],
+        }),
+        revokeSession: build.mutation<null, UserArg<string>>({
+            queryFn: ({ userId, input }) =>
+                run(() => user.revokeSession(userId, input)),
+            invalidatesTags: ["Session"],
+        }),
+        changePassword: build.mutation<
+            null,
+            { userId: string; sessionId?: string }
+        >({
+            queryFn: ({ userId, sessionId }) =>
+                run(() => user.changePassword(userId, sessionId)),
+            invalidatesTags: ["Session"],
         }),
         platformSettings: build.query<PlatformSettings, void>({
             queryFn: () => run(() => getPlatformSettings()),
@@ -127,21 +161,42 @@ export const api = createApi({
             queryFn: (userId) => run(() => payments.listUserRequests(userId)),
             providesTags: ["Request"],
         }),
-        createDeposit: build.mutation<AnyRequest, payments.MovementInput>({
+        depositInstructions: build.query<
+            payments.DepositInstructions,
+            payments.DepositInstructionsInput
+        >({
+            queryFn: (input) =>
+                run(() => payments.getDepositInstructions(input)),
+        }),
+        createDeposit: build.mutation<AnyRequest, payments.DepositInput>({
             queryFn: (input) => run(() => payments.createDeposit(input)),
             invalidatesTags: ["Request", "Transaction", "Account"],
         }),
-        createWithdrawal: build.mutation<AnyRequest, payments.MovementInput>({
+        createWithdrawal: build.mutation<AnyRequest, payments.WithdrawalInput>({
             queryFn: (input) => run(() => payments.createWithdrawal(input)),
             invalidatesTags: ["Request", "Transaction", "Account"],
         }),
         createTransfer: build.mutation<AnyRequest, payments.TransferInput>({
             queryFn: (input) => run(() => payments.createTransfer(input)),
-            invalidatesTags: ["Request", "Transaction", "Account"],
+            invalidatesTags: [
+                "Request",
+                "Transaction",
+                "Account",
+                "Beneficiary",
+            ],
         }),
-        quote: build.query<Quote, Omit<payments.ConvertInput, "userId">>({
-            queryFn: (input) => run(() => payments.getQuote(input)),
-            providesTags: ["Settings"],
+        beneficiaries: build.query<Beneficiary[], string>({
+            queryFn: (userId) => run(() => payments.listBeneficiaries(userId)),
+            providesTags: ["Beneficiary"],
+        }),
+        // Indicative prices, cached for a minute (pages that need a live feed poll).
+        rates: build.query<RatesSnapshot, void>({
+            queryFn: () => run(() => payments.getRates()),
+            providesTags: ["Rates", "Settings"],
+            keepUnusedDataFor: 60,
+        }),
+        lockQuote: build.mutation<LockedQuote, payments.QuoteInput>({
+            queryFn: (input) => run(() => payments.lockQuote(input)),
         }),
         createConversion: build.mutation<AnyRequest, payments.ConvertInput>({
             queryFn: (input) => run(() => payments.createConversion(input)),
@@ -173,14 +228,21 @@ export const api = createApi({
                 run(() => products.applyForCredit(userId, input)),
             invalidatesTags: ["Credit"],
         }),
-        cardOrders: build.query<CardOrder[], string>({
-            queryFn: (userId) => run(() => products.listCardOrders(userId)),
-            providesTags: ["CardOrder"],
-        }),
-        orderCard: build.mutation<CardOrder, UserArg<products.CardOrderInput>>({
+        selectCardPlan: build.mutation<
+            AnyRequest,
+            UserArg<products.CardPlanInput>
+        >({
             queryFn: ({ userId, input }) =>
-                run(() => products.orderCard(userId, input)),
-            invalidatesTags: ["CardOrder"],
+                run(() => products.selectCardPlan(userId, input)),
+            invalidatesTags: ["Request", "Transaction", "Account"],
+        }),
+        orderPhysicalCard: build.mutation<
+            AnyRequest,
+            UserArg<products.PhysicalCardInput>
+        >({
+            queryFn: ({ userId, input }) =>
+                run(() => products.orderPhysicalCard(userId, input)),
+            invalidatesTags: ["Request", "Transaction", "Account"],
         }),
         tickets: build.query<SupportTicket[], string>({
             queryFn: (userId) => run(() => products.listTickets(userId)),
@@ -213,10 +275,6 @@ export const api = createApi({
                 run(() => admin.listCreditApplications(adminId)),
             providesTags: ["Credit"],
         }),
-        adminCardOrders: build.query<CardOrder[], string>({
-            queryFn: (adminId) => run(() => admin.listAllCardOrders(adminId)),
-            providesTags: ["CardOrder"],
-        }),
         reviewRequest: build.mutation<AnyRequest, ReviewInput>({
             queryFn: (input) => run(() => admin.reviewRequestAsAdmin(input)),
             invalidatesTags: [
@@ -224,6 +282,7 @@ export const api = createApi({
                 "Account",
                 "Transaction",
                 "Notification",
+                "User",
             ],
         }),
         reviewKyc: build.mutation<KycSubmission, ReviewInput>({
@@ -233,10 +292,6 @@ export const api = createApi({
         reviewCredit: build.mutation<CreditApplication, ReviewInput>({
             queryFn: (input) => run(() => admin.reviewCreditAsAdmin(input)),
             invalidatesTags: ["Credit", "Notification"],
-        }),
-        reviewCardOrder: build.mutation<CardOrder, ReviewInput>({
-            queryFn: (input) => run(() => admin.reviewCardOrderAsAdmin(input)),
-            invalidatesTags: ["CardOrder", "Notification"],
         }),
         updatePlatformSettings: build.mutation<
             PlatformSettings,
@@ -257,8 +312,10 @@ export const api = createApi({
                 "Settings",
                 "Kyc",
                 "Credit",
-                "CardOrder",
                 "Ticket",
+                "Session",
+                "Beneficiary",
+                "Rates",
             ],
         }),
     }),
@@ -268,38 +325,44 @@ export const {
     useSignInMutation,
     useSignUpMutation,
     useRequestPasswordResetMutation,
+    useSignOutMutation,
     useSendContactMessageMutation,
     useMeQuery,
     useAccountsQuery,
     useTransactionsQuery,
     useNotificationsQuery,
     useMarkNotificationsReadMutation,
-    useUpdateProfileMutation,
+    useSetDisplayCurrencyMutation,
+    useSetAvatarMutation,
+    useSetTwoFactorMutation,
+    useSessionsQuery,
+    useRevokeSessionMutation,
     useChangePasswordMutation,
     usePlatformSettingsQuery,
     useUserRequestsQuery,
     useCreateDepositMutation,
     useCreateWithdrawalMutation,
+    useDepositInstructionsQuery,
     useCreateTransferMutation,
-    useQuoteQuery,
+    useBeneficiariesQuery,
+    useRatesQuery,
+    useLockQuoteMutation,
     useCreateConversionMutation,
     useKycQuery,
     useSubmitKycMutation,
     useCreditsQuery,
     useApplyForCreditMutation,
-    useCardOrdersQuery,
-    useOrderCardMutation,
+    useSelectCardPlanMutation,
+    useOrderPhysicalCardMutation,
     useTicketsQuery,
     useCreateTicketMutation,
     useAdminUsersQuery,
     useAdminKycQuery,
     useAdminRequestsQuery,
     useAdminCreditsQuery,
-    useAdminCardOrdersQuery,
     useReviewRequestMutation,
     useReviewKycMutation,
     useReviewCreditMutation,
-    useReviewCardOrderMutation,
     useUpdatePlatformSettingsMutation,
     useResetDemoMutation,
 } = api;

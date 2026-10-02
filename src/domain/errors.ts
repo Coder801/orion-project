@@ -15,6 +15,12 @@ export type DomainErrorCode =
     | "recipientNotFound"
     | "recipientSelf"
     | "reasonRequired"
+    | "amountOutOfRange"
+    | "invalidCode"
+    | "invalidDetails"
+    | "quoteExpired"
+    | "planUnavailable"
+    | "requestPending"
     | "invariant";
 
 /** Business-rule violation; `code` maps to the `domainErrors.<code>` i18n key. */

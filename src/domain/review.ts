@@ -61,7 +61,3 @@ export function reviewKyc(repo: Repository, input: ReviewInput) {
 export function reviewCredit(repo: Repository, input: ReviewInput) {
     return review(repo, repo.credits, "credit", input);
 }
-
-export function reviewCardOrder(repo: Repository, input: ReviewInput) {
-    return review(repo, repo.cardOrders, "cardOrder", input);
-}

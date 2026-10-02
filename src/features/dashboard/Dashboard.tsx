@@ -1,10 +1,12 @@
 "use client";
 
 import {
-    BellIcon,
-    CheckCheckIcon,
+    ArrowDownToLineIcon,
+    ArrowRightIcon,
+    ArrowUpFromLineIcon,
     CoinsIcon,
     ReceiptIcon,
+    SendIcon,
     WalletIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -12,54 +14,110 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
+import { ROUTES } from "@/config/routes";
 import { availableBalance } from "@/domain/rules";
-import type { Account } from "@/domain/types";
+import type { Account, CurrencyType, User } from "@/domain/types";
 import { accountLabel } from "@/features/accounts/identifiers";
 import { useCurrentUser } from "@/features/auth/session";
+import { CardWidget } from "@/features/dashboard/CardWidget";
+import { PhysicalCardCta } from "@/features/dashboard/PhysicalCardCta";
 import { TransactionsTable } from "@/features/dashboard/TransactionsTable";
-import { NotificationText } from "@/features/notifications/NotificationText";
 import { AsyncContent } from "@/features/shared/AsyncContent";
+import { BalanceTotals } from "@/features/shared/BalanceTotals";
 import { Panel } from "@/features/shared/Panel";
+import { StatusBadge } from "@/features/shared/StatusBadge";
+import { Link } from "@/i18n/navigation";
 import { useCurrencies, useFormatMoney } from "@/lib/hooks/useMoney";
 import { cn } from "@/lib/utils";
 import {
     useAccountsQuery,
-    useMarkNotificationsReadMutation,
-    useNotificationsQuery,
+    useMeQuery,
     useTransactionsQuery,
 } from "@/store/api";
 
-function BalanceCard({ account }: { account: Account }) {
+const RECENT_LIMIT = 10;
+
+const QUICK_ACTIONS = [
+    { href: ROUTES.deposit, key: "deposit", icon: ArrowDownToLineIcon },
+    { href: ROUTES.withdraw, key: "withdraw", icon: ArrowUpFromLineIcon },
+    { href: ROUTES.transfer, key: "transfer", icon: SendIcon },
+] as const;
+
+function Welcome({ user }: { user: User }) {
+    const t = useTranslations("dashboard");
+    const firstName = user.name.trim().split(/\s+/)[0] ?? user.name;
+    return (
+        <div className="flex flex-wrap items-center gap-3">
+            <h2 className="font-heading text-xl font-semibold sm:text-2xl">
+                {t("welcome", { name: firstName })}
+            </h2>
+            <StatusBadge
+                status={user.kycStatus}
+                label={t("kyc", { status: t(`kycStatus.${user.kycStatus}`) })}
+            />
+        </div>
+    );
+}
+
+function QuickActions() {
+    const t = useTranslations("dashboard.actions");
+    return (
+        <nav aria-label={t("label")} className="grid grid-cols-3 gap-3">
+            {QUICK_ACTIONS.map(({ href, key, icon: Icon }) => (
+                <Button
+                    key={key}
+                    asChild
+                    variant="outline"
+                    className="h-auto flex-col gap-2 rounded-2xl py-4"
+                >
+                    <Link href={href}>
+                        <span
+                            aria-hidden
+                            className="grid size-9 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary"
+                        >
+                            <Icon className="size-4" />
+                        </span>
+                        {t(key)}
+                    </Link>
+                </Button>
+            ))}
+        </nav>
+    );
+}
+
+function AccountRow({ account }: { account: Account }) {
     const t = useTranslations("dashboard");
     const formatMoney = useFormatMoney();
     const currencies = useCurrencies();
-    const isCrypto = currencies.get(account.currency)?.type === "crypto";
-    const Icon = isCrypto ? CoinsIcon : WalletIcon;
-
+    const type = currencies.get(account.currency)?.type ?? "crypto";
+    const Icon = type === "crypto" ? CoinsIcon : WalletIcon;
     return (
-        <div className="group relative h-full overflow-hidden rounded-2xl border bg-card p-5 transition-colors hover:border-primary/30">
-            <div
+        <li className="flex items-center gap-3 py-3">
+            <span
                 aria-hidden
                 className={cn(
-                    "pointer-events-none absolute -top-12 -right-12 size-32 rounded-full blur-2xl transition-opacity duration-300 group-hover:opacity-100",
-                    isCrypto ? "bg-accent/10" : "bg-primary/10",
-                    "opacity-60",
+                    "grid size-9 shrink-0 place-items-center rounded-xl border",
+                    type === "crypto"
+                        ? "border-accent/25 bg-accent/10 text-accent-foreground dark:text-accent"
+                        : "border-primary/25 bg-primary/10 text-primary",
                 )}
-            />
-            <div className="relative flex items-center justify-between gap-2">
-                <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                    <span
-                        aria-hidden
-                        className={cn(
-                            "flex size-6 items-center justify-center rounded-lg border",
-                            isCrypto
-                                ? "border-accent/25 bg-accent/10 text-accent-foreground dark:text-accent"
-                                : "border-primary/25 bg-primary/10 text-primary",
-                        )}
-                    >
-                        <Icon className="size-3.5" />
-                    </span>
+            >
+                <Icon className="size-4" />
+            </span>
+            <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">
                     {accountLabel(account)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                    {t(`accountType.${type}`)}
+                    {account.hold !== "0" &&
+                        ` · ${t("available")} ${formatMoney(availableBalance(account), account.currency)}`}
+                </p>
+            </div>
+            <div className="text-right">
+                <p className="font-medium tabular-nums">
+                    {formatMoney(account.balance, account.currency)}
                 </p>
                 {account.hold !== "0" && (
                     <Badge variant="warning" className="px-2 py-0 text-[10px]">
@@ -67,66 +125,51 @@ function BalanceCard({ account }: { account: Account }) {
                     </Badge>
                 )}
             </div>
-            <p className="relative mt-3 font-heading text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">
-                {formatMoney(account.balance, account.currency)}
-            </p>
-            <dl className="relative mt-4 grid grid-cols-2 gap-2 border-t pt-3 text-xs">
-                <div>
-                    <dt className="text-muted-foreground">{t("available")}</dt>
-                    <dd className="mt-0.5 font-medium tabular-nums">
-                        {formatMoney(
-                            availableBalance(account),
-                            account.currency,
-                        )}
-                    </dd>
-                </div>
-                <div>
-                    <dt className="text-muted-foreground">{t("hold")}</dt>
-                    <dd className="mt-0.5 font-medium tabular-nums">
-                        {formatMoney(account.hold, account.currency)}
-                    </dd>
-                </div>
-            </dl>
-        </div>
+        </li>
     );
 }
 
-function Balances({ userId }: { userId: string }) {
+function Accounts({ accounts }: { accounts: Account[] }) {
     const t = useTranslations("dashboard");
-    const { data = [], isLoading, isError, refetch } = useAccountsQuery(userId);
+    const currencies = useCurrencies();
+    const byType = (type: CurrencyType) =>
+        accounts.filter(
+            (a) => (currencies.get(a.currency)?.type ?? "crypto") === type,
+        );
 
     return (
-        <section aria-labelledby="balances-title">
-            <h2
-                id="balances-title"
-                className="mb-3 font-heading text-base font-semibold"
-            >
-                {t("balances")}
-            </h2>
-            <AsyncContent
-                isLoading={isLoading}
-                isError={isError}
-                isEmpty={data.length === 0}
-                onRetry={refetch}
-                loadingLabel={t("balances")}
-                empty={{ title: t("noAccounts"), icon: WalletIcon }}
-                skeleton={
-                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                        {[0, 1, 2, 3].map((i) => (
-                            <Skeleton key={i} className="h-40 rounded-2xl" />
-                        ))}
-                    </div>
-                }
-            >
-                <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    {data.map((account) => (
-                        <li key={account.id}>
-                            <BalanceCard account={account} />
-                        </li>
+        <Panel title={t("accounts")}>
+            <Tabs defaultValue="fiat">
+                <TabsList aria-label={t("accounts")}>
+                    {(["fiat", "crypto"] as const).map((type) => (
+                        <TabsTrigger key={type} value={type}>
+                            {t(`accountType.${type}`)}
+                        </TabsTrigger>
                     ))}
-                </ul>
-            </AsyncContent>
-        </section>
+                </TabsList>
+                {(["fiat", "crypto"] as const).map((type) => {
+                    const list = byType(type);
+                    return (
+                        <TabsContent key={type} value={type} className="mt-2">
+                            {list.length === 0 ? (
+                                <p className="py-6 text-center text-sm text-muted-foreground">
+                                    {t("noAccounts")}
+                                </p>
+                            ) : (
+                                <ul className="divide-y">
+                                    {list.map((account) => (
+                                        <AccountRow
+                                            key={account.id}
+                                            account={account}
+                                        />
+                                    ))}
+                                </ul>
+                            )}
+                        </TabsContent>
+                    );
+                })}
+            </Tabs>
+        </Panel>
     );
 }
 
@@ -137,15 +180,20 @@ function RecentTransactions({ userId }: { userId: string }) {
         isLoading,
         isError,
         refetch,
-    } = useTransactionsQuery({
-        userId,
-        limit: 5,
-    });
+    } = useTransactionsQuery({ userId, limit: RECENT_LIMIT });
     const isEmpty = data.length === 0;
 
     return (
         <Panel
             title={t("recentTransactions")}
+            actions={
+                <Button asChild variant="ghost" size="sm" className="text-xs">
+                    <Link href={ROUTES.transactions}>
+                        {t("viewAll")}
+                        <ArrowRightIcon aria-hidden />
+                    </Link>
+                </Button>
+            }
             flush={!isLoading && !isError && !isEmpty}
         >
             <AsyncContent
@@ -162,84 +210,52 @@ function RecentTransactions({ userId }: { userId: string }) {
     );
 }
 
-function Notifications({ userId }: { userId: string }) {
-    const t = useTranslations("dashboard");
-    const {
-        data = [],
-        isLoading,
-        isError,
-        refetch,
-    } = useNotificationsQuery(userId);
-    const [markRead, { isLoading: isMarking }] =
-        useMarkNotificationsReadMutation();
-    const unread = data.filter((n) => !n.read).length;
+export function Dashboard() {
+    const t = useTranslations("common");
+    const session = useCurrentUser();
+    const me = useMeQuery(session.id);
+    const accounts = useAccountsQuery(session.id);
 
     return (
-        <Panel
-            title={
-                <>
-                    {t("notifications")}
-                    {unread > 0 && (
-                        <Badge variant="glow" className="px-2 py-0 text-[10px]">
-                            {unread}
-                        </Badge>
-                    )}
-                </>
-            }
-            actions={
-                unread > 0 && (
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs"
-                        disabled={isMarking}
-                        onClick={() => markRead(userId)}
-                    >
-                        <CheckCheckIcon aria-hidden />
-                        {t("markAllRead")}
-                    </Button>
-                )
+        <AsyncContent
+            isLoading={me.isLoading || accounts.isLoading}
+            isError={me.isError || accounts.isError}
+            onRetry={() => {
+                me.refetch();
+                accounts.refetch();
+            }}
+            loadingLabel={t("loading")}
+            skeleton={
+                <div className="space-y-6">
+                    <Skeleton className="h-8 w-64" />
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Skeleton className="h-32 rounded-2xl" />
+                        <Skeleton className="h-32 rounded-2xl" />
+                    </div>
+                    <Skeleton className="h-56 rounded-2xl" />
+                </div>
             }
         >
-            <AsyncContent
-                isLoading={isLoading}
-                isError={isError}
-                isEmpty={data.length === 0}
-                onRetry={refetch}
-                loadingLabel={t("notifications")}
-                empty={{ title: t("noNotifications"), icon: BellIcon }}
-            >
-                <ul className="-my-3 divide-y">
-                    {data.slice(0, 8).map((n) => (
-                        <li key={n.id} className="flex items-start gap-3 py-3">
-                            <span
-                                aria-hidden
-                                className={cn(
-                                    "mt-1.5 size-2 shrink-0 rounded-full",
-                                    !n.read &&
-                                        "bg-primary shadow-[0_0_8px_var(--glow-primary)]",
-                                )}
+            {me.data && accounts.data && (
+                <div className="space-y-6">
+                    <Welcome user={me.data} />
+                    <BalanceTotals accounts={accounts.data} />
+                    <div className="grid gap-6 lg:grid-cols-[minmax(0,22rem)_1fr]">
+                        <CardWidget user={me.data} accounts={accounts.data} />
+                        <div className="space-y-6">
+                            <QuickActions />
+                            <PhysicalCardCta
+                                user={me.data}
+                                accounts={accounts.data}
                             />
-                            <div className="min-w-0 flex-1">
-                                <NotificationText notification={n} />
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-            </AsyncContent>
-        </Panel>
-    );
-}
-
-export function Dashboard() {
-    const user = useCurrentUser();
-    return (
-        <div className="space-y-6">
-            <Balances userId={user.id} />
-            <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
-                <RecentTransactions userId={user.id} />
-                <Notifications userId={user.id} />
-            </div>
-        </div>
+                        </div>
+                    </div>
+                    <div className="grid gap-6 xl:grid-cols-[1fr_2fr]">
+                        <Accounts accounts={accounts.data} />
+                        <RecentTransactions userId={session.id} />
+                    </div>
+                </div>
+            )}
+        </AsyncContent>
     );
 }

@@ -25,8 +25,9 @@ beforeEach(() => {
             birthDate: "1990-01-01",
             country: "DE",
         },
-        address: { line1: "x", city: "y", postalCode: "z" },
+        address: { line1: "x", city: "y", postalCode: "z", proof: [] },
         document: { type: "passport", number: "1", files: [] },
+        selfie: { id: "f1", name: "s.jpg", size: 1, mimeType: "image/jpeg" },
         status: "pending",
         createdAt: "",
     });

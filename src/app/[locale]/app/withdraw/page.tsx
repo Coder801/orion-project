@@ -1,5 +1,5 @@
 import { RequireKyc } from "@/features/auth/Guards";
-import { MovementForm } from "@/features/payments/MovementForm";
+import { WithdrawForm } from "@/features/payments/WithdrawForm";
 import { UserRequests } from "@/features/payments/UserRequests";
 import { Page } from "@/features/shared/Page";
 import { pageMetadata } from "@/lib/metadata";
@@ -11,7 +11,7 @@ export default function WithdrawPage() {
         <Page pageKey="withdraw">
             <RequireKyc operation="withdraw">
                 <div className="space-y-6">
-                    <MovementForm kind="withdrawal" />
+                    <WithdrawForm />
                     <UserRequests kinds={["withdrawal"]} />
                 </div>
             </RequireKyc>

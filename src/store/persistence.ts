@@ -12,6 +12,7 @@ const userSchema = z.object({
     name: z.string(),
     email: z.string(),
     role: z.enum(["user", "admin"]),
+    sessionId: z.string().optional(),
 }) satisfies z.ZodType<SessionUser>;
 
 export function parseSessionCookie(

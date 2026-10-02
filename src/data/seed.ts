@@ -1,6 +1,10 @@
 import {
+    DEFAULT_CARD_PLANS,
+    DEFAULT_CREDIT,
     DEFAULT_CURRENCIES,
     DEFAULT_FEES,
+    DEFAULT_LIMITS,
+    DEFAULT_PHYSICAL_CARD,
     DEFAULT_USD_PRICES,
 } from "@/config/currencies";
 import { DEFAULT_METHODS } from "@/config/methods";
@@ -9,7 +13,7 @@ import { applyRequest, submitRequest } from "@/domain/ledger";
 import { feeFromBps } from "@/domain/money";
 import type { Account, User } from "@/domain/types";
 
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
 /** Demo sign-in accounts shown on the sign-in page (any password of 8+ chars works). */
 export const DEMO_EMAILS = {
@@ -29,7 +33,8 @@ export function createEmptyState(): DbState {
         requests: [],
         kyc: [],
         credits: [],
-        cardOrders: [],
+        beneficiaries: [],
+        sessions: [],
         tickets: [],
         notifications: [],
         audit: [],
@@ -38,6 +43,10 @@ export function createEmptyState(): DbState {
             methods: structuredClone(DEFAULT_METHODS),
             usdPrices: { ...DEFAULT_USD_PRICES },
             fees: { ...DEFAULT_FEES },
+            limits: structuredClone(DEFAULT_LIMITS),
+            cardPlans: structuredClone(DEFAULT_CARD_PLANS),
+            physicalCard: structuredClone(DEFAULT_PHYSICAL_CARD),
+            credit: structuredClone(DEFAULT_CREDIT),
         },
     };
 }
@@ -58,6 +67,7 @@ function user(
         role: "user",
         kycStatus: "approved",
         createdAt: "2026-01-02T10:00:00.000Z",
+        displayCurrency: "EUR",
         ...patch,
     };
 }
@@ -80,7 +90,12 @@ export function createSeed(): DbState {
     const admin = "usr_admin";
     const fees = DEFAULT_FEES;
 
-    repo.users.insert(user("usr_demo", DEMO_EMAILS.user, "Demo User"));
+    repo.users.insert(
+        user("usr_demo", DEMO_EMAILS.user, "Demo User", {
+            phone: "+00 000 000 0000",
+            country: "DE",
+        }),
+    );
     repo.users.insert(
         user("usr_new", DEMO_EMAILS.newcomer, "New User", {
             kycStatus: "none",
@@ -176,6 +191,42 @@ export function createSeed(): DbState {
             toAmount: "781250",
         },
     });
+    submitRequest(repo, {
+        kind: "card",
+        userId: "usr_demo",
+        method: "card-plan",
+        payload: {
+            accountId: "acc_demo_eur2",
+            currency: "EUR",
+            amount: "499",
+            fee: "0",
+            product: { kind: "plan", plan: "plus" },
+        },
+    });
+
+    repo.beneficiaries.insert({
+        id: repo.nextId("ben"),
+        userId: "usr_demo",
+        rail: "sepa",
+        name: "Placeholder Recipient",
+        iban: "DE89370400440532013000",
+        bic: "DEUTDEFF",
+        createdAt: repo.now(),
+    });
+
+    for (const [device, hoursAgo] of [
+        ["Browser · Desktop", 30],
+        ["App · Mobile", 74],
+    ] as const) {
+        const at = new Date(tick - hoursAgo * 3_600_000).toISOString();
+        repo.sessions.insert({
+            id: repo.nextId("ses"),
+            userId: "usr_demo",
+            device,
+            createdAt: at,
+            lastActiveAt: at,
+        });
+    }
 
     repo.kyc.insert({
         id: repo.nextId("kyc"),
@@ -190,6 +241,14 @@ export function createSeed(): DbState {
             line1: "Placeholder street 1",
             city: "Placeholder city",
             postalCode: "00000",
+            proof: [
+                {
+                    id: "blob_seed_3",
+                    name: "proof-of-address.pdf",
+                    size: 120544,
+                    mimeType: "application/pdf",
+                },
+            ],
         },
         document: {
             type: "passport",
@@ -203,6 +262,12 @@ export function createSeed(): DbState {
                 },
             ],
         },
+        selfie: {
+            id: "blob_seed_2",
+            name: "selfie.jpg",
+            size: 35120,
+            mimeType: "image/jpeg",
+        },
         status: "pending",
         createdAt: repo.now(),
     });
@@ -213,18 +278,10 @@ export function createSeed(): DbState {
         amount: "500000",
         currency: "EUR",
         termMonths: 12,
-        purpose: "personal",
+        purpose: "homeRenovation",
+        employment: "employed",
         monthlyIncome: "350000",
-        status: "pending",
-        createdAt: repo.now(),
-    });
-
-    repo.cardOrders.insert({
-        id: repo.nextId("card"),
-        userId: "usr_demo",
-        type: "virtual",
-        tier: "standard",
-        accountId: "acc_demo_eur",
+        monthlyObligations: "40000",
         status: "pending",
         createdAt: repo.now(),
     });

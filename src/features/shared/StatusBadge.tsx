@@ -26,12 +26,19 @@ const VARIANT: Record<AnyStatus, BadgeVariant> = {
     closed: "secondary",
 };
 
-export function StatusBadge({ status }: { status: AnyStatus }) {
+export function StatusBadge({
+    status,
+    label,
+}: {
+    status: AnyStatus;
+    /** Domain-specific wording for the status (colour still follows `status`). */
+    label?: string;
+}) {
     const t = useTranslations("status");
     return (
         <Badge variant={VARIANT[status]} className="px-2.5 py-0.5">
             <span aria-hidden className="size-1.5 rounded-full bg-current" />
-            {t(status)}
+            {label ?? t(status)}
         </Badge>
     );
 }
