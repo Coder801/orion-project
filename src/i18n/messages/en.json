@@ -711,9 +711,9 @@
         },
         "extras": {
             "virtualCard": "Virtual card",
-            "freeFx": "Reduced conversion fee",
-            "travelInsurance": "Travel insurance (placeholder)",
-            "loungeAccess": "Lounge access (placeholder)"
+            "freeFx": "Lower FX fee",
+            "travelInsurance": "Travel insurance",
+            "loungeAccess": "Lounge access"
         },
         "select": "Select",
         "currentButton": "Current plan",
@@ -744,7 +744,10 @@
             }
         },
         "planLabel": "Card plan",
-        "networkMark": "DEMO"
+        "networkMark": "DEMO",
+        "flipHint": "Tap for details",
+        "showDetails": "Show details of {plan}",
+        "showFront": "Show the front of {plan}"
     },
     "support": {
         "formTitle": "New ticket",

@@ -3,6 +3,7 @@
 import {
     CheckIcon,
     GlobeIcon,
+    RotateCwIcon,
     ShieldCheckIcon,
     SparklesIcon,
     ZapIcon,
@@ -115,108 +116,165 @@ function PlanCard({
 }) {
     const t = useTranslations("cards");
     const text = usePlanText();
+    const [flipped, setFlipped] = useState(false);
     const included = !current && locked;
     const skin = skinFor(plan);
+    const name = text.name(plan);
+    const face = cn(
+        cardFaceClass,
+        CARD_SKINS[skin],
+        "absolute inset-0 aspect-auto flex flex-col justify-between [backface-visibility:hidden]",
+    );
+
+    // The whole face flips the card; content sits above the flip target with
+    // pointer events off, except the Select button.
+    const flipTarget = (
+        <button
+            type="button"
+            onClick={() => setFlipped((f) => !f)}
+            aria-pressed={flipped}
+            aria-label={t(flipped ? "showFront" : "showDetails", {
+                plan: name,
+            })}
+            className="absolute inset-0 z-0 cursor-pointer rounded-2xl focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-hidden focus-visible:ring-inset"
+        />
+    );
+    const sheen = (
+        <>
+            <CardShine />
+            {skin === "obsidian" && (
+                <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 bg-linear-120 from-transparent via-white/10 to-transparent"
+                />
+            )}
+        </>
+    );
 
     return (
         <article
-            className="group flex h-full flex-col gap-4"
             aria-labelledby={`plan-${plan.id}`}
+            className="group relative aspect-[1.586] w-full [perspective:1200px]"
         >
             <div
                 className={cn(
-                    cardFaceClass,
-                    CARD_SKINS[skin],
-                    "flex flex-col justify-between transition-transform duration-300 motion-safe:group-hover:-translate-y-1",
+                    "relative h-full w-full rounded-2xl transition-transform duration-700 [transform-style:preserve-3d] motion-reduce:transition-none",
+                    flipped
+                        ? "[transform:rotateY(180deg)]"
+                        : "motion-safe:group-hover:-translate-y-1",
                     plan.popular &&
                         "shadow-[0_12px_40px_-12px_var(--glow-primary)]",
                     current &&
                         "ring-2 ring-success ring-offset-2 ring-offset-background",
                 )}
             >
-                <CardShine />
-                {skin === "obsidian" && (
-                    <span
-                        aria-hidden
-                        className="pointer-events-none absolute inset-0 bg-linear-120 from-transparent via-white/10 to-transparent"
-                    />
-                )}
-                <div className="relative flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                        <p className="text-[10px] tracking-widest text-white/70 uppercase">
-                            {t("planLabel")}
-                        </p>
-                        <h3
-                            id={`plan-${plan.id}`}
-                            className="truncate font-heading text-xl font-bold"
-                        >
-                            {text.name(plan)}
-                        </h3>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                        {plan.popular && (
-                            <CardTag>
-                                <SparklesIcon aria-hidden className="size-3" />
-                                {t("popular")}
-                            </CardTag>
-                        )}
-                        {current && <CardTag>{t("current")}</CardTag>}
-                        {pending && <CardTag>{t("pending")}</CardTag>}
-                    </div>
-                </div>
-                <CardChip className="relative" />
-                <div className="relative flex items-end justify-between gap-3">
-                    <div className="min-w-0">
-                        <p className="font-heading text-2xl leading-tight font-bold tabular-nums">
-                            {text.price(plan)}
-                        </p>
-                        <p className="text-[11px] text-white/75">
-                            {t(`billingType.${plan.billing}`)}
-                        </p>
-                    </div>
-                    <span
-                        aria-hidden
-                        className="font-heading text-lg font-black tracking-tight text-white/90 italic"
-                    >
-                        {t("networkMark")}
-                    </span>
-                </div>
-            </div>
-
-            <div className="flex flex-1 flex-col rounded-2xl border bg-card p-4">
-                <dl className="space-y-2 text-sm">
-                    {text.features(plan).map(([label, value]) => (
-                        <div key={label} className="flex justify-between gap-3">
-                            <dt className="text-muted-foreground">{label}</dt>
-                            <dd className="font-medium tabular-nums">
-                                {value}
-                            </dd>
+                {/* Front: plan, price and the action. */}
+                <div className={face} aria-hidden={flipped}>
+                    {sheen}
+                    {!flipped && flipTarget}
+                    <div className="pointer-events-none relative z-[1] flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                            <p className="text-[10px] tracking-widest text-white/70 uppercase">
+                                {t("planLabel")}
+                            </p>
+                            <h3
+                                id={`plan-${plan.id}`}
+                                className="truncate font-heading text-xl font-bold"
+                            >
+                                {name}
+                            </h3>
                         </div>
-                    ))}
-                </dl>
-                <ul className="mt-4 mb-5 space-y-1.5 border-t pt-4 text-sm">
-                    {plan.extras.map((extra) => (
-                        <li key={extra} className="flex items-center gap-2">
-                            <CheckIcon
-                                className="size-4 shrink-0 text-success"
-                                aria-hidden
-                            />
-                            {t(`extras.${extra as "virtualCard"}`)}
-                        </li>
-                    ))}
-                </ul>
-                <Button
-                    className="mt-auto w-full"
-                    variant={plan.popular ? "gradient" : "outline"}
-                    disabled={current || included || pending || locked}
-                    onClick={onSelect}
+                        <div className="flex flex-col items-end gap-1">
+                            {plan.popular && (
+                                <CardTag>
+                                    <SparklesIcon
+                                        aria-hidden
+                                        className="size-3"
+                                    />
+                                    {t("popular")}
+                                </CardTag>
+                            )}
+                            {current && <CardTag>{t("current")}</CardTag>}
+                            {pending && <CardTag>{t("pending")}</CardTag>}
+                        </div>
+                    </div>
+                    <div className="pointer-events-none relative z-[1] flex items-center justify-between">
+                        <CardChip />
+                        <span className="flex items-center gap-1 text-[10px] text-white/70">
+                            <RotateCwIcon aria-hidden className="size-3" />
+                            {t("flipHint")}
+                        </span>
+                    </div>
+                    <div className="pointer-events-none relative z-[1] flex items-end justify-between gap-3">
+                        <div className="min-w-0">
+                            <p className="font-heading text-2xl leading-tight font-bold tabular-nums">
+                                {text.price(plan)}
+                            </p>
+                            <p className="text-[11px] text-white/75">
+                                {t(`billingType.${plan.billing}`)}
+                            </p>
+                        </div>
+                        <Button
+                            size="sm"
+                            className="pointer-events-auto shrink-0 bg-white text-zinc-900 shadow-md hover:bg-white/90 disabled:bg-white/25 disabled:text-white disabled:opacity-100"
+                            disabled={current || included || pending || locked}
+                            tabIndex={flipped ? -1 : undefined}
+                            onClick={onSelect}
+                        >
+                            {current
+                                ? t("currentButton")
+                                : included
+                                  ? t("included")
+                                  : t("select")}
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Back: limits, support, cashback and extras. */}
+                <div
+                    className={cn(face, "[transform:rotateY(180deg)]")}
+                    aria-hidden={!flipped}
                 >
-                    {current
-                        ? t("currentButton")
-                        : included
-                          ? t("included")
-                          : t("select")}
-                </Button>
+                    {sheen}
+                    {flipped && flipTarget}
+                    <span
+                        aria-hidden
+                        className="pointer-events-none absolute inset-x-0 top-4 h-6 bg-black/50"
+                    />
+                    <dl className="pointer-events-none relative z-[1] mt-8 grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
+                        {text.features(plan).map(([label, value]) => (
+                            <div key={label} className="min-w-0">
+                                <dt className="truncate text-white/70">
+                                    {label}
+                                </dt>
+                                <dd className="truncate font-semibold tabular-nums">
+                                    {value}
+                                </dd>
+                            </div>
+                        ))}
+                    </dl>
+                    <div className="pointer-events-none relative z-[1] flex items-end justify-between gap-2">
+                        <ul className="flex flex-wrap gap-1">
+                            {plan.extras.map((extra) => (
+                                <li key={extra}>
+                                    <CardTag>
+                                        <CheckIcon
+                                            aria-hidden
+                                            className="size-3"
+                                        />
+                                        {t(`extras.${extra as "virtualCard"}`)}
+                                    </CardTag>
+                                </li>
+                            ))}
+                        </ul>
+                        <span
+                            aria-hidden
+                            className="font-heading text-lg font-black tracking-tight text-white/90 italic"
+                        >
+                            {t("networkMark")}
+                        </span>
+                    </div>
+                </div>
             </div>
         </article>
     );
