@@ -24,6 +24,11 @@ const authSlice = createSlice({
             state.user = null;
             state.signedOut = true;
         },
+        /** The API rejected the session (expired, revoked): guards send the user to sign-in. */
+        sessionExpired(state) {
+            state.user = null;
+            state.signedOut = false;
+        },
         sessionUpdated(state, action: PayloadAction<Partial<SessionUser>>) {
             if (state.user) state.user = { ...state.user, ...action.payload };
         },
@@ -36,7 +41,8 @@ const authSlice = createSlice({
     },
 });
 
-export const { loggedIn, loggedOut, sessionUpdated } = authSlice.actions;
+export const { loggedIn, loggedOut, sessionExpired, sessionUpdated } =
+    authSlice.actions;
 export const {
     selectUser,
     selectIsAuthenticated,

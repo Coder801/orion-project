@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { AppReadyProvider } from "@/components/AppReady";
@@ -10,9 +9,9 @@ import { DemoBanner } from "@/components/layout/DemoBanner";
 import { PageLoader } from "@/components/site/PageLoader";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/Sonner";
+import { getServerSessionUser } from "@/features/auth/server";
 import { routing } from "@/i18n/routing";
 import { initialAuthState } from "@/store/authSlice";
-import { parseSessionCookie, SESSION_COOKIE } from "@/store/persistence";
 import { StoreProvider } from "@/store/StoreProvider";
 import "../globals.css";
 
@@ -70,8 +69,7 @@ export default async function LocaleLayout({
     if (!hasLocale(routing.locales, locale)) notFound();
     setRequestLocale(locale);
 
-    const cookieStore = await cookies();
-    const user = parseSessionCookie(cookieStore.get(SESSION_COOKIE)?.value);
+    const user = await getServerSessionUser();
 
     return (
         <html

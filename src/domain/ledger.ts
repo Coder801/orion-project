@@ -281,7 +281,8 @@ export interface ApplyResult {
 }
 
 /**
- * The only place where balances change. Runs atomically and is idempotent:
+ * The only place where requests change balances (manual adjustments are
+ * done by orion-bank-api). Runs atomically and is idempotent:
  * re-applying a reviewed request returns it unchanged.
  */
 export function applyRequest(

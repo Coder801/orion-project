@@ -18,12 +18,14 @@ import {
     DetailList,
     ReviewActions,
     ReviewDialog,
+    UserLink,
     useUserEmails,
     type ReviewTarget,
 } from "@/features/admin/Review";
 import { useCurrentUser } from "@/features/auth/session";
 import { RequestAmount } from "@/features/payments/RequestAmount";
 import { AsyncContent } from "@/features/shared/AsyncContent";
+import { MoneyPausedNotice } from "@/features/shared/MoneyPausedNotice";
 import { Panel } from "@/features/shared/Panel";
 import { StatusBadge } from "@/features/shared/StatusBadge";
 import { formatDate, formatDecimal } from "@/lib/format";
@@ -32,6 +34,13 @@ import { useAdminRequestsQuery, useReviewRequestMutation } from "@/store/api";
 
 const ALL = "all";
 const STATUSES: ReviewStatus[] = ["pending", "approved", "rejected"];
+const ALL_KINDS: RequestKind[] = [
+    "deposit",
+    "withdrawal",
+    "transfer",
+    "conversion",
+    "card",
+];
 
 function currencyOf(request: AnyRequest): string {
     return request.kind === "conversion"
@@ -106,8 +115,17 @@ function RequestDetails({
     return <DetailList items={items} />;
 }
 
-/** Review queue for money-movement requests of the given kinds. */
-export function RequestsQueue({ kinds }: { kinds: RequestKind[] }) {
+/**
+ * Review queue for money-movement requests of the given kinds; with `userId`
+ * it shows that user's requests only (the admin user page).
+ */
+export function RequestsQueue({
+    kinds = ALL_KINDS,
+    userId,
+}: {
+    kinds?: RequestKind[];
+    userId?: string;
+}) {
     const t = useTranslations("admin.requests");
     const tr = useTranslations("requests");
     const ts = useTranslations("status");
@@ -122,11 +140,13 @@ export function RequestsQueue({ kinds }: { kinds: RequestKind[] }) {
     } = useAdminRequestsQuery(admin.id);
     const [review, { isLoading: isReviewing }] = useReviewRequestMutation();
     const [target, setTarget] = useState<ReviewTarget | null>(null);
-    const [status, setStatus] = useState<string>("pending");
+    const [status, setStatus] = useState<string>(userId ? ALL : "pending");
     const [kind, setKind] = useState<string>(ALL);
     const [currency, setCurrency] = useState<string>(ALL);
 
-    const scoped = data.filter((r) => kinds.includes(r.kind));
+    const scoped = data.filter(
+        (r) => kinds.includes(r.kind) && (!userId || r.userId === userId),
+    );
     const currencies = [...new Set(scoped.map(currencyOf))].sort();
     const rows = scoped.filter(
         (r) =>
@@ -139,7 +159,8 @@ export function RequestsQueue({ kinds }: { kinds: RequestKind[] }) {
     const isEmpty = rows.length === 0;
 
     return (
-        <>
+        <div className="space-y-6">
+            <MoneyPausedNotice />
             <Panel
                 toolbar={
                     <div className="grid gap-3 sm:grid-cols-3">
@@ -199,7 +220,7 @@ export function RequestsQueue({ kinds }: { kinds: RequestKind[] }) {
                                 <TableHead className="pl-5 lg:pl-6">
                                     {tr("date")}
                                 </TableHead>
-                                <TableHead>{t("user")}</TableHead>
+                                {!userId && <TableHead>{t("user")}</TableHead>}
                                 <TableHead>{tr("kind")}</TableHead>
                                 <TableHead>{tr("amount")}</TableHead>
                                 <TableHead>{tr("status")}</TableHead>
@@ -220,10 +241,14 @@ export function RequestsQueue({ kinds }: { kinds: RequestKind[] }) {
                                             "dateTime",
                                         )}
                                     </TableCell>
-                                    <TableCell className="max-w-48 truncate">
-                                        {emails.get(request.userId) ??
-                                            request.userId}
-                                    </TableCell>
+                                    {!userId && (
+                                        <TableCell className="max-w-48 truncate">
+                                            <UserLink
+                                                userId={request.userId}
+                                                emails={emails}
+                                            />
+                                        </TableCell>
+                                    )}
                                     <TableCell>
                                         {tr(`kinds.${request.kind}`)}
                                     </TableCell>
@@ -270,6 +295,6 @@ export function RequestsQueue({ kinds }: { kinds: RequestKind[] }) {
                     />
                 )}
             </ReviewDialog>
-        </>
+        </div>
     );
 }

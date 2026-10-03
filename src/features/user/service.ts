@@ -1,4 +1,17 @@
-import { DISPLAY_CURRENCIES } from "@/config/currencies";
+import {
+    accountFromApi,
+    mirrorUser,
+    sessionFromApi,
+    transactionFromApi,
+} from "@/data/api/bridge";
+import { apiRequest } from "@/data/api/http";
+import type {
+    ApiAccount,
+    ApiMe,
+    ApiSession,
+    ApiTransaction,
+    ApiUser,
+} from "@/data/api/types";
 import { getRepository, withLatency } from "@/data/client";
 import type { Repository } from "@/data/repository";
 import { DomainError } from "@/domain/errors";
@@ -35,26 +48,25 @@ export function assertConfirmationCode(code: string | undefined): void {
     if (!/^\d{6}$/.test(code ?? "")) throw new DomainError("invalidCode");
 }
 
-export function getMe(userId: string): Promise<User> {
-    return withLatency(() => requireUser(getRepository(), userId), 150);
+/** Profile from the API merged with the fields mock features still own. */
+const merged = (user: ApiUser): User => mirrorUser(getRepository(), user);
+
+export async function getMe(): Promise<User> {
+    return merged((await apiRequest<ApiMe>("GET", "/auth/me")).user);
 }
 
-export function listAccounts(userId: string): Promise<Account[]> {
-    return withLatency(() =>
-        getRepository().accounts.list((a) => a.userId === userId),
+export async function listAccounts(): Promise<Account[]> {
+    const accounts = await apiRequest<ApiAccount[]>("GET", "/me/accounts");
+    return accounts.map(accountFromApi);
+}
+
+export async function listTransactions(limit?: number): Promise<Transaction[]> {
+    const query = limit ? `?limit=${limit}` : "";
+    const transactions = await apiRequest<ApiTransaction[]>(
+        "GET",
+        `/me/transactions${query}`,
     );
-}
-
-export function listTransactions(
-    userId: string,
-    limit?: number,
-): Promise<Transaction[]> {
-    return withLatency(() => {
-        const all = getRepository()
-            .transactions.list((tx) => tx.userId === userId)
-            .sort(byNewest);
-        return limit ? all.slice(0, limit) : all;
-    });
+    return transactions.map(transactionFromApi);
 }
 
 export function listNotifications(userId: string): Promise<Notification[]> {
@@ -79,17 +91,12 @@ export function markNotificationsRead(userId: string): Promise<null> {
     }, 100);
 }
 
-export function setDisplayCurrency(
-    userId: string,
+export async function setDisplayCurrency(
     currency: CurrencyCode,
 ): Promise<User> {
-    return withLatency(() => {
-        const repo = getRepository();
-        requireUser(repo, userId);
-        if (!(DISPLAY_CURRENCIES as readonly string[]).includes(currency))
-            throw new DomainError("currencyDisabled");
-        return repo.users.update(userId, { displayCurrency: currency });
-    });
+    return merged(
+        await apiRequest<ApiUser>("PUT", "/me/display-currency", { currency }),
+    );
 }
 
 const MAX_AVATAR_CHARS = 200_000;
@@ -114,75 +121,31 @@ export function setAvatar(
 }
 
 /** Turns 2FA on or off; both directions need a current code. */
-export function setTwoFactor(
-    userId: string,
-    input: { enabled: boolean; code: string },
-): Promise<User> {
-    return withLatency(() => {
-        const repo = getRepository();
-        requireUser(repo, userId);
-        assertConfirmationCode(input.code);
-        return repo.users.update(userId, { twoFactorEnabled: input.enabled });
-    });
+export async function setTwoFactor(input: {
+    enabled: boolean;
+    code: string;
+}): Promise<User> {
+    return merged(await apiRequest<ApiUser>("PUT", "/me/two-factor", input));
 }
 
-export function listSessions(userId: string): Promise<Session[]> {
-    return withLatency(() =>
-        getRepository()
-            .sessions.list((s) => s.userId === userId && !s.revokedAt)
-            .sort((a, b) => b.lastActiveAt.localeCompare(a.lastActiveAt)),
+export async function listSessions(): Promise<Session[]> {
+    const sessions = await apiRequest<ApiSession[]>("GET", "/me/sessions");
+    return sessions.map(sessionFromApi);
+}
+
+export function revokeSession(sessionId: string): Promise<null> {
+    return apiRequest<null>(
+        "DELETE",
+        `/me/sessions/${encodeURIComponent(sessionId)}`,
     );
 }
 
-export function createSession(repo: Repository, userId: string): Session {
-    const now = repo.now();
-    return repo.sessions.insert({
-        id: repo.nextId("ses"),
-        userId,
-        device: "Browser · Current device",
-        createdAt: now,
-        lastActiveAt: now,
-    });
-}
-
-export function revokeSession(
-    userId: string,
-    sessionId: string,
-): Promise<null> {
-    return withLatency(() => {
-        const repo = getRepository();
-        const session = repo.sessions.get(sessionId);
-        if (!session || session.userId !== userId)
-            throw new DomainError("notFound");
-        if (!session.revokedAt)
-            repo.sessions.update(sessionId, { revokedAt: repo.now() });
-        return null;
-    }, 150);
-}
-
-/**
- * Demo only: passwords are never stored. A successful change signs out every
- * other session, as a real backend would.
- */
-export function changePassword(
-    userId: string,
-    currentSessionId: string | undefined,
-): Promise<null> {
-    return withLatency(() => {
-        const repo = getRepository();
-        requireUser(repo, userId);
-        repo.transaction(() => {
-            for (const s of repo.sessions.list(
-                (s) =>
-                    s.userId === userId &&
-                    !s.revokedAt &&
-                    s.id !== currentSessionId,
-            )) {
-                repo.sessions.update(s.id, { revokedAt: repo.now() });
-            }
-        });
-        return null;
-    });
+/** The API signs out every other session after a successful change. */
+export function changePassword(input: {
+    currentPassword: string;
+    newPassword: string;
+}): Promise<null> {
+    return apiRequest<null>("POST", "/me/password", input);
 }
 
 export { byNewest };

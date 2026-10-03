@@ -102,7 +102,6 @@ function PasswordStrength({ value }: { value: string }) {
 function PasswordForm() {
     const t = useTranslations("settings.password");
     const tc = useTranslations("common");
-    const user = useCurrentUser();
     const fieldError = useFieldError();
     const apiError = useApiErrorMessage();
     const [changePassword, { isLoading }] = useChangePasswordMutation();
@@ -122,11 +121,8 @@ function PasswordForm() {
     });
     const newPassword = useWatch({ control, name: "newPassword" });
 
-    const onSubmit = handleSubmit(async () => {
-        const result = await changePassword({
-            userId: user.id,
-            sessionId: user.sessionId,
-        });
+    const onSubmit = handleSubmit(async ({ currentPassword, newPassword }) => {
+        const result = await changePassword({ currentPassword, newPassword });
         if ("data" in result) {
             reset();
             toast.success(t("changed"));

@@ -9,6 +9,7 @@ import {
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { Logo, LogoMark } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { GuestOnly } from "@/features/auth/Guards";
 import { Link } from "@/i18n/navigation";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
@@ -96,7 +97,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                     id="main"
                     className="relative flex flex-1 items-center justify-center px-6 pt-4 pb-16 lg:px-10"
                 >
-                    <div className="w-full max-w-md">{children}</div>
+                    <div className="w-full max-w-md">
+                        <GuestOnly>{children}</GuestOnly>
+                    </div>
                 </main>
             </div>
         </div>

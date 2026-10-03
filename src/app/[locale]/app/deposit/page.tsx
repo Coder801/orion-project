@@ -1,6 +1,7 @@
 import { RequireKyc } from "@/features/auth/Guards";
 import { DepositForm } from "@/features/payments/DepositForm";
 import { UserRequests } from "@/features/payments/UserRequests";
+import { MoneyPausedNotice } from "@/features/shared/MoneyPausedNotice";
 import { Page } from "@/features/shared/Page";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -11,6 +12,7 @@ export default function DepositPage() {
         <Page pageKey="deposit">
             <RequireKyc operation="deposit">
                 <div className="space-y-6">
+                    <MoneyPausedNotice />
                     <DepositForm />
                     <UserRequests kinds={["deposit"]} />
                 </div>

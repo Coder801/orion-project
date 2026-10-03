@@ -10,6 +10,7 @@ import { SubmitButton } from "@/components/ui/SubmitButton";
 import { Button } from "@/components/ui/Button";
 import { ROUTES } from "@/config/routes";
 import { DEMO_EMAILS } from "@/data/seed";
+
 import { AuthCard, authLinkClassName } from "@/features/auth/AuthCard";
 import { PasswordField } from "@/features/auth/PasswordField";
 import { signInSchema, type SignInValues } from "@/features/auth/schemas";
@@ -18,6 +19,9 @@ import { useApiErrorMessage, useFieldError } from "@/features/shared/errors";
 import { FormError } from "@/features/shared/FormStatus";
 import { Link } from "@/i18n/navigation";
 import { useSignInMutation } from "@/store/api";
+
+// Dev convenience: the API seed's DEMO_PASSWORD, set in .env.development.local.
+const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD;
 
 export function SignInForm() {
     const t = useTranslations("auth");
@@ -36,8 +40,8 @@ export function SignInForm() {
         defaultValues: { email: "", password: "" },
     });
 
-    const onSubmit = handleSubmit(async ({ email }) => {
-        const result = await signIn(email);
+    const onSubmit = handleSubmit(async ({ email, password }) => {
+        const result = await signIn({ email, password });
         if ("data" in result && result.data) completeSignIn(result.data);
     });
 
@@ -109,9 +113,10 @@ export function SignInForm() {
                                     setValue("email", email, {
                                         shouldValidate: true,
                                     });
-                                    setValue("password", "demo-password", {
-                                        shouldValidate: true,
-                                    });
+                                    if (DEMO_PASSWORD)
+                                        setValue("password", DEMO_PASSWORD, {
+                                            shouldValidate: true,
+                                        });
                                 }}
                             >
                                 {t(

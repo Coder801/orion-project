@@ -59,7 +59,13 @@ export interface Account {
 }
 
 export type TransactionType =
-    "deposit" | "withdrawal" | "transfer" | "conversion" | "card";
+    | "deposit"
+    | "withdrawal"
+    | "transfer"
+    | "conversion"
+    | "card"
+    /** Manual balance correction by an admin, outside the request flow. */
+    | "adjustment";
 export type TransactionStatus = "pending" | "completed" | "failed";
 
 export interface Transaction {
@@ -267,13 +273,16 @@ export interface SupportTicket {
 /** Entities whose status changes are reported to the user and audited. */
 export type ReviewEntity = "request" | "kyc" | "credit";
 
+/** Everything that notifies the user and is audited: reviews and balance adjustments. */
+export type AuditedEntity = ReviewEntity | "adjustment";
+
 export type NotificationSubject =
-    RequestKind | Exclude<ReviewEntity, "request">;
+    RequestKind | Exclude<AuditedEntity, "request">;
 
 export interface Notification {
     id: string;
     userId: string;
-    entity: ReviewEntity;
+    entity: AuditedEntity;
     entityId: string;
     /** What the message is about, e.g. the request kind. */
     subject: NotificationSubject;
@@ -286,10 +295,14 @@ export interface Notification {
 export interface AuditEntry {
     id: string;
     actorId: string;
-    entity: ReviewEntity;
+    entity: AuditedEntity;
     entityId: string;
-    from: ReviewStatus;
-    to: ReviewStatus;
+    /** Set for review status changes. */
+    from?: ReviewStatus;
+    to?: ReviewStatus;
+    /** Signed amount of a balance adjustment. */
+    amount?: Minor;
+    currency?: CurrencyCode;
     reason?: string;
     createdAt: string;
 }

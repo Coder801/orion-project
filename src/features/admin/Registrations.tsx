@@ -1,10 +1,9 @@
 "use client";
 
-import { FileCheckIcon, UsersIcon } from "lucide-react";
+import { FileCheckIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { Badge } from "@/components/ui/Badge";
 import {
     Table,
     TableBody,
@@ -13,12 +12,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/Table";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import type { KycSubmission } from "@/domain/types";
 import {
     DetailList,
     ReviewActions,
     ReviewDialog,
+    UserLink,
     useUserEmails,
     type ReviewTarget,
 } from "@/features/admin/Review";
@@ -27,88 +26,10 @@ import { AsyncContent } from "@/features/shared/AsyncContent";
 import { Panel } from "@/features/shared/Panel";
 import { StatusBadge } from "@/features/shared/StatusBadge";
 import { formatBytes, formatDate } from "@/lib/format";
-import {
-    useAdminKycQuery,
-    useAdminUsersQuery,
-    useReviewKycMutation,
-} from "@/store/api";
+import { useAdminKycQuery, useReviewKycMutation } from "@/store/api";
 
-const VIEWS = ["kyc", "users"] as const;
-type View = (typeof VIEWS)[number];
-
-// Both views render inside a flush panel, so their non-table states need padding.
+// The queue renders inside a flush panel, so its non-table states need padding.
 const FLUSH_STATE = "m-5 lg:m-6";
-
-function UsersTable({ adminId }: { adminId: string }) {
-    const t = useTranslations("admin.registrations");
-    const language = useLocale();
-    const {
-        data = [],
-        isLoading,
-        isError,
-        refetch,
-    } = useAdminUsersQuery(adminId);
-
-    return (
-        <AsyncContent
-            isLoading={isLoading}
-            isError={isError}
-            isEmpty={data.length === 0}
-            onRetry={refetch}
-            loadingLabel={t("users")}
-            stateClassName={FLUSH_STATE}
-            empty={{ title: t("noUsers"), icon: UsersIcon }}
-        >
-            <Table>
-                <TableHeader>
-                    <TableRow className="hover:bg-transparent">
-                        <TableHead className="pl-5 lg:pl-6">
-                            {t("email")}
-                        </TableHead>
-                        <TableHead>{t("name")}</TableHead>
-                        <TableHead>{t("role")}</TableHead>
-                        <TableHead>{t("kycStatus")}</TableHead>
-                        <TableHead className="pr-5 lg:pr-6">
-                            {t("registered")}
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {data.map((user) => (
-                        <TableRow key={user.id}>
-                            <TableCell className="pl-5 font-medium lg:pl-6">
-                                {user.email}
-                            </TableCell>
-                            <TableCell>{user.name}</TableCell>
-                            <TableCell>
-                                <Badge
-                                    variant={
-                                        user.role === "admin"
-                                            ? "accent"
-                                            : "secondary"
-                                    }
-                                    className="px-2.5 py-0.5"
-                                >
-                                    {t(`roles.${user.role}`)}
-                                </Badge>
-                            </TableCell>
-                            <TableCell>
-                                {user.role === "user" ? (
-                                    <StatusBadge status={user.kycStatus} />
-                                ) : (
-                                    "—"
-                                )}
-                            </TableCell>
-                            <TableCell className="pr-5 text-muted-foreground lg:pr-6">
-                                {formatDate(user.createdAt, language)}
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </AsyncContent>
-    );
-}
 
 function KycDetails({
     submission,
@@ -205,8 +126,10 @@ function KycQueue({ adminId }: { adminId: string }) {
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    {emails.get(submission.userId) ??
-                                        submission.userId}
+                                    <UserLink
+                                        userId={submission.userId}
+                                        emails={emails}
+                                    />
                                 </TableCell>
                                 <TableCell>
                                     {submission.personal.firstName}{" "}
@@ -260,40 +183,10 @@ function KycQueue({ adminId }: { adminId: string }) {
 }
 
 export function Registrations() {
-    const t = useTranslations("admin.registrations");
     const admin = useCurrentUser();
-    const { data: kyc = [] } = useAdminKycQuery(admin.id);
-    const [view, setView] = useState<View>("kyc");
-    const pending = kyc.filter((k) => k.status === "pending").length;
-
     return (
-        <Panel
-            flush
-            toolbar={
-                <Tabs
-                    value={view}
-                    onValueChange={(value) => setView(value as View)}
-                >
-                    <TabsList aria-label={t("views")}>
-                        {VIEWS.map((value) => (
-                            <TabsTrigger key={value} value={value}>
-                                {t(value)}
-                                {value === "kyc" && pending > 0 && (
-                                    <span className="rounded-full bg-primary/15 px-1.5 text-xs text-primary tabular-nums">
-                                        {pending}
-                                    </span>
-                                )}
-                            </TabsTrigger>
-                        ))}
-                    </TabsList>
-                </Tabs>
-            }
-        >
-            {view === "kyc" ? (
-                <KycQueue adminId={admin.id} />
-            ) : (
-                <UsersTable adminId={admin.id} />
-            )}
+        <Panel flush>
+            <KycQueue adminId={admin.id} />
         </Panel>
     );
 }

@@ -13,8 +13,9 @@ describe("redirectFor", () => {
 
     it("keeps each role in its own area", () => {
         expect(redirectFor("/admin/requests", "user")).toBe("/app/dashboard");
-        expect(redirectFor("/app/dashboard", "admin")).toBe(
-            "/admin/registrations",
+        expect(redirectFor("/app/dashboard", "admin")).toBe("/admin/users");
+        expect(redirectFor("/admin/users/usr_demo", "user")).toBe(
+            "/app/dashboard",
         );
         expect(redirectFor("/app/dashboard", "user")).toBeNull();
         expect(redirectFor("/admin/settings", "admin")).toBeNull();

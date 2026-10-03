@@ -106,12 +106,18 @@ export const NAV_SECTIONS: Record<NavVariant, NavSection[]> = {
     ],
     admin: [
         {
+            labelKey: "people",
+            items: [
+                { href: "/admin/users", labelKey: "users", icon: UsersIcon },
+            ],
+        },
+        {
             labelKey: "review",
             items: [
                 {
                     href: "/admin/registrations",
                     labelKey: "registrations",
-                    icon: UsersIcon,
+                    icon: BadgeCheckIcon,
                 },
                 {
                     href: "/admin/requests",

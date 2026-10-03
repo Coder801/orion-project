@@ -1,6 +1,11 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { ReviewInput } from "@/domain/audit";
-import { isDomainError, type DomainErrorCode } from "@/domain/errors";
+import { ApiRequestError } from "@/data/api/http";
+import {
+    isDomainError,
+    isDomainErrorCode,
+    type DomainErrorCode,
+} from "@/domain/errors";
 import { MoneyError } from "@/domain/money";
 import type { LockedQuote, RatesSnapshot } from "@/domain/rates";
 import type {
@@ -39,6 +44,14 @@ async function run<T>(
         return { data: await work() };
     } catch (error) {
         if (isDomainError(error)) return { error: { code: error.code } };
+        if (error instanceof ApiRequestError)
+            return {
+                error: {
+                    code: isDomainErrorCode(error.code)
+                        ? error.code
+                        : "unknown",
+                },
+            };
         if (error instanceof MoneyError)
             return { error: { code: "invalidAmount" } };
         console.error(error);
@@ -74,17 +87,17 @@ export const api = createApi({
     ],
     endpoints: (build) => ({
         // ─── Auth ───────────────────────────────────────────────────────────────
-        signIn: build.mutation<SessionUser, string>({
-            queryFn: (email) => run(() => auth.signIn(email)),
+        signIn: build.mutation<SessionUser, auth.SignInInput>({
+            queryFn: (input) => run(() => auth.signIn(input)),
         }),
-        signUp: build.mutation<SessionUser, { name: string; email: string }>({
+        signUp: build.mutation<SessionUser, auth.SignUpInput>({
             queryFn: (input) => run(() => auth.signUp(input)),
         }),
         requestPasswordReset: build.mutation<null, string>({
-            queryFn: () => run(() => auth.requestPasswordReset()),
+            queryFn: (email) => run(() => auth.requestPasswordReset(email)),
         }),
-        signOut: build.mutation<null, { userId: string; sessionId?: string }>({
-            queryFn: (session) => run(() => auth.signOut(session)),
+        signOut: build.mutation<null, void>({
+            queryFn: () => run(() => auth.signOut()),
         }),
 
         sendContactMessage: build.mutation<null, ContactValues>({
@@ -92,20 +105,21 @@ export const api = createApi({
         }),
 
         // ─── User ───────────────────────────────────────────────────────────────
+        // Profile and sessions come from orion-bank-api; the session cookie
+        // identifies the user, the id argument only scopes the cache.
         me: build.query<User, string>({
-            queryFn: (userId) => run(() => user.getMe(userId)),
+            queryFn: () => run(() => user.getMe()),
             providesTags: ["User"],
         }),
         accounts: build.query<Account[], string>({
-            queryFn: (userId) => run(() => user.listAccounts(userId)),
+            queryFn: () => run(() => user.listAccounts()),
             providesTags: ["Account"],
         }),
         transactions: build.query<
             Transaction[],
             { userId: string; limit?: number }
         >({
-            queryFn: ({ userId, limit }) =>
-                run(() => user.listTransactions(userId, limit)),
+            queryFn: ({ limit }) => run(() => user.listTransactions(limit)),
             providesTags: ["Transaction"],
         }),
         notifications: build.query<Notification[], string>({
@@ -117,8 +131,7 @@ export const api = createApi({
             invalidatesTags: ["Notification"],
         }),
         setDisplayCurrency: build.mutation<User, UserArg<CurrencyCode>>({
-            queryFn: ({ userId, input }) =>
-                run(() => user.setDisplayCurrency(userId, input)),
+            queryFn: ({ input }) => run(() => user.setDisplayCurrency(input)),
             invalidatesTags: ["User"],
         }),
         setAvatar: build.mutation<User, UserArg<string | null>>({
@@ -130,25 +143,22 @@ export const api = createApi({
             User,
             UserArg<{ enabled: boolean; code: string }>
         >({
-            queryFn: ({ userId, input }) =>
-                run(() => user.setTwoFactor(userId, input)),
+            queryFn: ({ input }) => run(() => user.setTwoFactor(input)),
             invalidatesTags: ["User"],
         }),
         sessions: build.query<Session[], string>({
-            queryFn: (userId) => run(() => user.listSessions(userId)),
+            queryFn: () => run(() => user.listSessions()),
             providesTags: ["Session"],
         }),
         revokeSession: build.mutation<null, UserArg<string>>({
-            queryFn: ({ userId, input }) =>
-                run(() => user.revokeSession(userId, input)),
+            queryFn: ({ input }) => run(() => user.revokeSession(input)),
             invalidatesTags: ["Session"],
         }),
         changePassword: build.mutation<
             null,
-            { userId: string; sessionId?: string }
+            { currentPassword: string; newPassword: string }
         >({
-            queryFn: ({ userId, sessionId }) =>
-                run(() => user.changePassword(userId, sessionId)),
+            queryFn: (input) => run(() => user.changePassword(input)),
             invalidatesTags: ["Session"],
         }),
         platformSettings: build.query<PlatformSettings, void>({
@@ -259,8 +269,24 @@ export const api = createApi({
 
         // ─── Admin ──────────────────────────────────────────────────────────────
         adminUsers: build.query<User[], string>({
-            queryFn: (adminId) => run(() => admin.listUsers(adminId)),
+            queryFn: () => run(() => admin.listUsers()),
             providesTags: ["User"],
+        }),
+        adminUser: build.query<User, admin.UserScope>({
+            queryFn: (scope) => run(() => admin.getUser(scope)),
+            providesTags: ["User"],
+        }),
+        adminUserAccounts: build.query<Account[], admin.UserScope>({
+            queryFn: (scope) => run(() => admin.listUserAccounts(scope)),
+            providesTags: ["Account"],
+        }),
+        adminUserTransactions: build.query<Transaction[], admin.UserScope>({
+            queryFn: (scope) => run(() => admin.listUserTransactions(scope)),
+            providesTags: ["Transaction"],
+        }),
+        adjustBalance: build.mutation<Transaction, admin.AdjustmentInput>({
+            queryFn: (input) => run(() => admin.adjustUserBalance(input)),
+            invalidatesTags: ["Account", "Transaction", "Notification"],
         }),
         adminKyc: build.query<KycSubmission[], string>({
             queryFn: (adminId) => run(() => admin.listKycSubmissions(adminId)),
@@ -357,6 +383,10 @@ export const {
     useTicketsQuery,
     useCreateTicketMutation,
     useAdminUsersQuery,
+    useAdminUserQuery,
+    useAdminUserAccountsQuery,
+    useAdminUserTransactionsQuery,
+    useAdjustBalanceMutation,
     useAdminKycQuery,
     useAdminRequestsQuery,
     useAdminCreditsQuery,

@@ -1,3 +1,15 @@
+import {
+    accountFromApi,
+    assertMoneyMovementOpen,
+    transactionFromApi,
+    userFromApi,
+} from "@/data/api/bridge";
+import { apiRequest } from "@/data/api/http";
+import type {
+    ApiAccount,
+    ApiAdminUser,
+    ApiTransaction,
+} from "@/data/api/types";
 import { getRepository, resetDemoData, withLatency } from "@/data/client";
 import type { Repository } from "@/data/repository";
 import type { ReviewInput } from "@/domain/audit";
@@ -6,10 +18,14 @@ import { applyRequest } from "@/domain/ledger";
 import { parseDecimal } from "@/domain/money";
 import { reviewCredit, reviewKyc } from "@/domain/review";
 import type {
+    Account,
     AnyRequest,
+    CurrencyCode,
+    Minor,
     CreditApplication,
     KycSubmission,
     PlatformSettings,
+    Transaction,
     User,
 } from "@/domain/types";
 import { byNewest } from "@/features/user/service";
@@ -31,8 +47,71 @@ function asAdmin<T>(
     });
 }
 
-export const listUsers = (adminId: string): Promise<User[]> =>
-    asAdmin(adminId, (repo) => repo.users.list().sort(byNewest));
+// ─── Users (orion-bank-api; the admin's cookie authorizes, ids scope the cache) ─
+
+const userPath = (userId: string) =>
+    `/admin/users/${encodeURIComponent(userId)}`;
+
+export async function listUsers(): Promise<User[]> {
+    const users = await apiRequest<ApiAdminUser[]>("GET", "/admin/users");
+    return users.map(userFromApi);
+}
+
+export interface UserScope {
+    adminId: string;
+    userId: string;
+}
+
+export async function getUser({ userId }: UserScope): Promise<User> {
+    return userFromApi(await apiRequest<ApiAdminUser>("GET", userPath(userId)));
+}
+
+export async function listUserAccounts({
+    userId,
+}: UserScope): Promise<Account[]> {
+    const accounts = await apiRequest<ApiAccount[]>(
+        "GET",
+        `${userPath(userId)}/accounts`,
+    );
+    return accounts.map(accountFromApi);
+}
+
+export async function listUserTransactions({
+    userId,
+}: UserScope): Promise<Transaction[]> {
+    const transactions = await apiRequest<ApiTransaction[]>(
+        "GET",
+        `${userPath(userId)}/transactions`,
+    );
+    return transactions.map(transactionFromApi);
+}
+
+export interface AdjustmentInput {
+    adminId: string;
+    userId: string;
+    currency: CurrencyCode;
+    /** Signed minor units: positive credits the account, negative debits available funds. */
+    amount: Minor;
+    reason: string;
+}
+
+/** Manual credit/debit; the API writes the transaction, notification and audit entry. */
+export async function adjustUserBalance({
+    userId,
+    currency,
+    amount,
+    reason,
+}: AdjustmentInput): Promise<Transaction> {
+    return transactionFromApi(
+        await apiRequest<ApiTransaction>(
+            "POST",
+            `${userPath(userId)}/adjustments`,
+            { currency, amount, reason: reason.trim() },
+        ),
+    );
+}
+
+// ─── Review queues (mock) ───────────────────────────────────────────────────
 
 export const listKycSubmissions = (adminId: string): Promise<KycSubmission[]> =>
     asAdmin(adminId, (repo) => repo.kyc.list().sort(byNewest));
@@ -46,7 +125,10 @@ export const listCreditApplications = (
     asAdmin(adminId, (repo) => repo.credits.list().sort(byNewest));
 
 export const reviewRequestAsAdmin = (input: ReviewInput) =>
-    asAdmin(input.adminId, (repo) => applyRequest(repo, input).request);
+    asAdmin(input.adminId, (repo) => {
+        assertMoneyMovementOpen();
+        return applyRequest(repo, input).request;
+    });
 
 export const reviewKycAsAdmin = (input: ReviewInput) =>
     asAdmin(input.adminId, (repo) => reviewKyc(repo, input).item);

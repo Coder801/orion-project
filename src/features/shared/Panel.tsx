@@ -54,7 +54,9 @@ export function Panel({
                 <div
                     className={cn(
                         flush
-                            ? cn(hasHeader && "mt-4", "border-t")
+                            ? // The divider separates the header; without one the
+                              // section's own border already frames the table.
+                              hasHeader && "mt-4 border-t"
                             : cn("p-5 lg:p-6", hasHeader && "pt-4 lg:pt-5"),
                     )}
                 >

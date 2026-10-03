@@ -14,8 +14,12 @@ export const ROUTES = {
     support: "/app/support",
     settings: "/app/settings",
     verification: "/app/verification",
-    adminHome: "/admin/registrations",
+    adminUsers: "/admin/users",
+    adminHome: "/admin/users",
 } as const;
+
+export const adminUserRoute = (userId: string) =>
+    `${ROUTES.adminUsers}/${encodeURIComponent(userId)}`;
 
 export function homeFor(role: Role): string {
     return role === "admin" ? ROUTES.adminHome : ROUTES.dashboard;

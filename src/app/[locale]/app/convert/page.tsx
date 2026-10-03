@@ -1,6 +1,7 @@
 import { RequireKyc } from "@/features/auth/Guards";
 import { ConvertForm } from "@/features/convert/ConvertForm";
 import { UserRequests } from "@/features/payments/UserRequests";
+import { MoneyPausedNotice } from "@/features/shared/MoneyPausedNotice";
 import { Page } from "@/features/shared/Page";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -11,6 +12,7 @@ export default function ConvertPage() {
         <Page pageKey="convert">
             <RequireKyc operation="convert">
                 <div className="space-y-6">
+                    <MoneyPausedNotice />
                     <ConvertForm />
                     <UserRequests kinds={["conversion"]} />
                 </div>

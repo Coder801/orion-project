@@ -20,6 +20,7 @@ const TYPES: TransactionType[] = [
     "transfer",
     "conversion",
     "card",
+    "adjustment",
 ];
 const STATUSES: TransactionStatus[] = ["pending", "completed", "failed"];
 

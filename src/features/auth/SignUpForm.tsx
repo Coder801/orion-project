@@ -38,8 +38,8 @@ export function SignUpForm() {
         },
     });
 
-    const onSubmit = handleSubmit(async ({ name, email }) => {
-        const result = await signUp({ name, email });
+    const onSubmit = handleSubmit(async ({ name, email, password }) => {
+        const result = await signUp({ name, email, password });
         if ("data" in result && result.data) completeSignIn(result.data);
     });
 

@@ -2,7 +2,7 @@
 
 import { ShieldAlertIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { PageLoader } from "@/components/layout/PageLoader";
 import { Button } from "@/components/ui/Button";
@@ -12,7 +12,6 @@ import { homeFor, redirectFor, ROUTES } from "@/config/routes";
 import { isKycApproved, type KycOperation } from "@/domain/rules";
 import type { Role } from "@/domain/types";
 import { useCurrentUser } from "@/features/auth/session";
-import { useSignOut } from "@/features/auth/useSignOut";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { useMeQuery } from "@/store/api";
 import { selectSignedOut, selectUser } from "@/store/authSlice";
@@ -32,6 +31,17 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     // After an explicit sign-out the caller navigates away itself.
     if (signedOut) return <PageLoader fullscreen />;
     return <Redirect to={redirectFor(pathname, null) ?? ROUTES.signIn} />;
+}
+
+/**
+ * Auth pages: a visitor who already had a session when the page opened goes
+ * home. Sessions started on the page navigate themselves (`?next=`).
+ */
+export function GuestOnly({ children }: { children: ReactNode }) {
+    const user = useAppSelector(selectUser);
+    const [initialUser] = useState(user);
+    if (initialUser && user) return <Redirect to={homeFor(user.role)} />;
+    return children;
 }
 
 export function RequireRole({
@@ -56,22 +66,9 @@ export function RequireKyc({
 }) {
     const t = useTranslations("kycGate");
     const user = useCurrentUser();
-    const signOut = useSignOut();
-    const {
-        data: me,
-        isLoading,
-        isError,
-        error,
-        refetch,
-    } = useMeQuery(user.id);
+    const { data: me, isLoading, isError, refetch } = useMeQuery(user.id);
 
-    // The mock DB was reset under an old session cookie.
-    const missing = isError && "code" in error && error.code === "notFound";
-    useEffect(() => {
-        if (missing) signOut();
-    }, [missing, signOut]);
-
-    if (isLoading || missing) return <PageLoader />;
+    if (isLoading) return <PageLoader />;
     if (isError || !me) return <ErrorState onRetry={refetch} />;
     if (isKycApproved(me)) return children;
 

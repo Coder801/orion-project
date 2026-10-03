@@ -1,3 +1,4 @@
+import { assertMoneyMovementOpen } from "@/data/api/bridge";
 import {
     QUOTE_TTL_MS,
     NETWORK_CONFIRMATIONS,
@@ -194,6 +195,7 @@ export interface DepositInput {
  * The account for the currency is opened on first use.
  */
 export function createDeposit(input: DepositInput): Promise<AnyRequest> {
+    assertMoneyMovementOpen();
     return withLatency(() => {
         const repo = getRepository();
         requireVerifiedUser(repo, input.userId);
@@ -262,6 +264,7 @@ export interface WithdrawalInput {
 }
 
 export function createWithdrawal(input: WithdrawalInput): Promise<AnyRequest> {
+    assertMoneyMovementOpen();
     return withLatency(() => {
         const repo = getRepository();
         requireVerifiedUser(repo, input.userId);
@@ -389,6 +392,7 @@ function saveBeneficiary(
 }
 
 export function createTransfer(input: TransferInput): Promise<AnyRequest> {
+    assertMoneyMovementOpen();
     return withLatency(() => {
         const repo = getRepository();
         requireVerifiedUser(repo, input.userId);
@@ -530,6 +534,7 @@ export interface ConvertInput {
 
 /** Creates the conversion from the locked quote, never from client-side numbers. */
 export function createConversion(input: ConvertInput): Promise<AnyRequest> {
+    assertMoneyMovementOpen();
     return withLatency(() => {
         const repo = getRepository();
         requireVerifiedUser(repo, input.userId);

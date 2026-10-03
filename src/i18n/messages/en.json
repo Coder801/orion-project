@@ -26,6 +26,7 @@
         "accountDetails": "Account details",
         "settings": "Settings",
         "support": "Support",
+        "users": "Users",
         "registrations": "Registrations",
         "requests": "Requests",
         "conversions": "Conversions",
@@ -53,6 +54,7 @@
             "money": "Money",
             "products": "Products",
             "account": "Account",
+            "people": "People",
             "review": "Review",
             "platform": "Platform"
         },
@@ -108,7 +110,7 @@
     "domainErrors": {
         "notFound": "Not found",
         "forbidden": "Not allowed",
-        "invalidCredentials": "No account with this email",
+        "invalidCredentials": "Wrong email or password",
         "emailTaken": "This email is already registered",
         "kycRequired": "Complete verification first",
         "kycAlreadySubmitted": "Verification is already submitted",
@@ -129,7 +131,14 @@
         "invalidDetails": "Recipient details are invalid",
         "quoteExpired": "The quote has expired — request a new one",
         "planUnavailable": "This plan cannot be selected",
-        "requestPending": "A similar request is already awaiting review"
+        "requestPending": "A similar request is already awaiting review",
+        "unauthorized": "Your session has ended — please sign in again",
+        "accountBlocked": "This account is blocked",
+        "rateLimited": "Too many attempts — try again in a minute",
+        "invalidPassword": "The current password is incorrect",
+        "validation": "Some fields are invalid",
+        "network": "The server is unreachable — is the API running?",
+        "moneyMovementPaused": "Paused while balances move to the new backend"
     },
     "status": {
         "pending": "Pending",
@@ -187,9 +196,17 @@
             "title": "Support",
             "description": "Contact support"
         },
+        "users": {
+            "title": "Users",
+            "description": "All users, their balances and requests"
+        },
+        "adminUser": {
+            "title": "User",
+            "description": "Profile, balances, transactions and requests"
+        },
         "registrations": {
             "title": "Registrations",
-            "description": "Users and KYC review"
+            "description": "Identity verification (KYC) queue"
         },
         "requests": {
             "title": "Requests",
@@ -271,7 +288,7 @@
         },
         "demoAccounts": {
             "title": "Demo accounts",
-            "hint": "Any password of 8+ characters works.",
+            "hint": "Seeded by the API (make seed); the password is DEMO_PASSWORD from its .env.",
             "user": "Verified user",
             "newcomer": "Unverified user",
             "pending": "KYC pending",
@@ -350,7 +367,8 @@
             "conversion": "Conversion",
             "card": "Card payment",
             "kyc": "Verification",
-            "credit": "Credit application"
+            "credit": "Credit application",
+            "adjustment": "Balance adjustment"
         }
     },
     "transactions": {
@@ -367,7 +385,8 @@
             "withdrawal": "Withdrawal",
             "transfer": "Transfer",
             "conversion": "Conversion",
-            "card": "Card payment"
+            "card": "Card payment",
+            "adjustment": "Balance adjustment"
         }
     },
     "payments": {
@@ -915,18 +934,9 @@
             "deliveryAddress": "Delivery address"
         },
         "registrations": {
-            "views": "Views",
-            "users": "Users",
-            "noUsers": "No users",
             "email": "Email",
             "name": "Name",
-            "role": "Role",
             "kycStatus": "KYC",
-            "registered": "Registered",
-            "roles": {
-                "user": "User",
-                "admin": "Admin"
-            },
             "kyc": "KYC review",
             "noKyc": "No submissions",
             "submitted": "Submitted",
@@ -965,6 +975,69 @@
             "reset": "Reset",
             "resetConfirm": "All changes made in this browser will be lost.",
             "cancel": "Cancel"
+        },
+        "users": {
+            "loading": "Loading users",
+            "empty": "No users match the search",
+            "search": "Search",
+            "searchPlaceholder": "Name or email",
+            "email": "Email",
+            "name": "Name",
+            "role": "Role",
+            "kycStatus": "KYC",
+            "registered": "Registered",
+            "roles": {
+                "user": "User",
+                "admin": "Admin"
+            },
+            "open": "Open",
+            "actions": "Actions",
+            "back": "All users",
+            "notFound": "User not found",
+            "adminNoData": "Admins have no balances or requests of their own.",
+            "tabs": {
+                "label": "User data",
+                "profile": "Profile",
+                "accounts": "Balances",
+                "transactions": "Transactions",
+                "requests": "Requests"
+            },
+            "profile": {
+                "phone": "Phone",
+                "country": "Country",
+                "displayCurrency": "Display currency",
+                "cardPlan": "Card plan",
+                "twoFactor": "Two-factor authentication",
+                "on": "On",
+                "off": "Off"
+            },
+            "accounts": {
+                "currency": "Currency",
+                "balance": "Balance",
+                "hold": "On hold",
+                "available": "Available",
+                "empty": "No accounts yet",
+                "adjust": "Adjust"
+            },
+            "noTransactions": "No transactions yet",
+            "adjust": {
+                "open": "Adjust balance",
+                "title": "Adjust balance",
+                "description": "Credits or debits the account outside the request flow. The user is notified and the change is audited.",
+                "direction": "Operation",
+                "directions": {
+                    "credit": "Credit (add funds)",
+                    "debit": "Debit (remove funds)"
+                },
+                "currency": "Currency",
+                "amount": "Amount",
+                "available": "Available: {amount}",
+                "reason": "Reason",
+                "reasonHint": "Shown to the user and saved in the audit log.",
+                "submit": "Apply",
+                "cancel": "Cancel",
+                "done": "Balance adjusted"
+            }
         }
     },
     "uiKit": {
@@ -1432,5 +1505,9 @@
             "button": "Open dashboard",
             "support": "Contact support"
         }
+    },
+    "moneyPaused": {
+        "title": "Operations are paused",
+        "description": "Balances now come from the new backend. Deposits, withdrawals, transfers, conversions, card payments and their review will return once requests move there too."
     }
 }

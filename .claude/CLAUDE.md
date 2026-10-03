@@ -19,7 +19,7 @@ Demo multi-currency wallet (**fiat + crypto**): public landing, auth, user area 
 - **recharts** — charts
 - **lucide-react** — icons
 - **Vitest** — unit tests (domain rules, schemas)
-- Data comes from an in-browser **mock repository** (`src/data`); there is no real backend
+- Data: **orion-bank-api** (FastAPI, separate repo `../orion-bank-backend`, docs at `http://localhost:8000/api/docs`) for auth, profile and sessions; everything else still runs on the in-browser **mock repository** (`src/data`) until the API has it
 
 ## Commands
 
@@ -63,14 +63,15 @@ src/
 ## Routes & Logic
 
 - `/[locale]` — **Landing**: sections rendered from `config/landing.ts` (Hero, About, Services, Partners, License, Support, Contact us, Footer), one component per section in `features/landing/sections/`, each at least `min-h-svh` on desktop (`lg`+; on mobile content-height with a `SectionDivider` between them) with ScrollTrigger effects (desktop only) (Services is a 3×2 card grid, License cards stack); sections marked `data-snap` get proximity snapping (`lenis/snap` in `SmoothScroll`, CSS scroll-snap when Lenis is off); header links scroll to anchors; the contact form goes through the mock `sendContactMessage` mutation (nothing is sent).
-- `/[locale]/auth/sign-in | sign-up | forgot-password` — mock auth; sign-in accepts any registered email + any password of 8+ chars (demo accounts listed on the page).
+- `/[locale]/auth/sign-in | sign-up | forgot-password` — real auth via the API; demo accounts (listed on the page) are seeded by `make seed` in the API repo with its `DEMO_PASSWORD`.
 - `/[locale]/app/*` — `dashboard`, `transactions`, `deposit`, `withdraw`, `transfer`, `convert`, `verification`, `credit`, `cards`, `account-details`, `settings`, `support`, `about`. Page spec: `docs/admin-panel-scheme.md`.
-- `/[locale]/admin/*` — `registrations` (users + KYC review), `requests`, `conversions`, `credits`, `card-orders` (`card` requests: plan upgrades and physical cards), `settings` (currencies, methods, rates, fees, reset demo data).
+- `/[locale]/admin/*` — `users` (admin home: all users) and `users/[id]` (profile, balances with manual adjustment, transactions, the user's requests with review actions), `registrations` (KYC review), `requests`, `conversions`, `credits`, `card-orders` (`card` requests: plan upgrades and physical cards), `settings` (currencies, methods, rates, fees, reset demo data).
 
-Access control: `proxy.ts` redirects by the session cookie (optimistic); `<RequireAuth>`, `<RequireRole>`, `<RequireKyc>` repeat the checks on the client. Both use `redirectFor()` from `config/routes.ts`.
+Access control: the API session is the httpOnly `orion_sid` cookie. `proxy.ts` only sends guests (no cookie) away from `app`/`admin`; the root layout resolves the user with `getServerSessionUser()` (`features/auth/server.ts`, `GET /auth/me`) and `<RequireAuth>`, `<RequireRole>`, `<RequireKyc>`, `<GuestOnly>` do the role checks on the client via `redirectFor()` from `config/routes.ts`. An `unauthorized` answer from any API call ends the local session (`sessionGuard` in `store/store.ts`).
 
 ### Business rules
-- Balances change **only** in `applyRequest()` (`domain/ledger.ts`) when an admin approves — atomic (repository transaction with rollback) and idempotent.
+- Balances change in `applyRequest()` (`domain/ledger.ts`, mock, currently paused) when an admin approves — atomic and idempotent — and in the API's `POST /admin/users/{id}/adjustments` for an admin's manual credit/debit (reason required, debits only from available funds, writes an `adjustment` transaction + Notification + AuditEntry).
+- Roles: `user` has a wallet; `admin` (the "master" user) has none — they see every user, open their data and act on it. Admin-only services go through `asAdmin()` (`features/admin/service.ts`).
 - Debit requests (withdrawal, transfer, conversion, card) move `amount + fee` to `hold` on creation; rejection releases the hold. Card plan upgrades and physical card orders are `card` requests; approving a plan switches `user.cardPlan`.
 - Withdrawal forms are generated from `config/methods.ts` field schemas + zod (`features/payments/fieldSchema.ts`); deposit methods show bank details / provider checkout / a crypto address instead (`DEPOSIT_FLOW`). Amount limits per currency live in `settings.limits`.
 - Withdrawals and transfers require a 6-digit step-up code (mock: any 6 digits). Card numbers are "tokenized" in the service — only a token + last 4 are stored.
@@ -114,6 +115,14 @@ Access control: `proxy.ts` redirects by the session cookie (optimistic); `<Requi
 
 ### Accessibility
 - Semantic tags, `aria-*` on interactive elements, visible focus styles.
+
+## API Layer
+- Next rewrites `/api/v1/*` to `apiOrigin()` (`data/api/origin.ts`): `API_URL` if set, else `http://localhost:8000` in development and `https://orion-project-backend-production.up.railway.app` in production. The rewrite is baked in at `next build`. Calls stay same-origin, so the httpOnly cookie and the API's Origin check work without CORS — the API's `WEB_ORIGIN` must equal the web app's origin (`http://localhost:4000` locally; the deployed frontend domain on Railway, with `COOKIE_SECURE=true`).
+- Browser calls go through `apiRequest()` (`data/api/http.ts`); the API's error envelope `{error: {code}}` becomes `ApiError.code` (`domain/errors.ts` lists the codes, messages under `domainErrors.*`). API shapes live in `data/api/types.ts`.
+- On the API: sign-in/up/out, forgot-password, `/auth/me`, display currency, 2FA, password change, sessions, the user's accounts and transactions (`/me/accounts`, `/me/transactions`), and admin users (`/admin/users`, `/{id}`, `/{id}/accounts|transactions`, `POST /{id}/adjustments`). Still mock: requests, KYC, credits, cards, support, notifications, platform settings and the review queues.
+- **Money movement is paused**: balances live in the API, so mock requests can't change them. Creating deposit/withdrawal/transfer/conversion/card requests and approving requests throw `moneyMovementPaused` (`assertMoneyMovementOpen()` in `data/api/bridge.ts`); the pages show `MoneyPausedNotice`. Lift this when the ledger moves to the API.
+- Bridge (`data/api/bridge.ts`): API and mock share user ids; `mirrorUser()` copies an API user into the mock DB (with fiat accounts) on sign-in and on every `me`. `kycStatus`, `cardPlan` and `avatar` stay mock-owned until their features move to the API.
+- Local env: `.env.development.local` (see `.env.example`); `NEXT_PUBLIC_DEMO_PASSWORD` fills the demo-account buttons.
 
 ## Mock Layer Rules
 - Feature services wrap repository calls in `withLatency()` (Promise + `setTimeout`). Mutations without a payload resolve to `null`, never `undefined` (RTK Query rejects `{ data: undefined }`).

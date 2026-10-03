@@ -15,9 +15,11 @@ import {
 } from "@/components/ui/Dialog";
 import { TextareaField } from "@/components/ui/FormField";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { adminUserRoute } from "@/config/routes";
 import type { ReviewDecision, ReviewStatus } from "@/domain/types";
 import { useApiErrorMessage } from "@/features/shared/errors";
 import { FormError } from "@/features/shared/FormStatus";
+import { Link } from "@/i18n/navigation";
 import { useAdminUsersQuery } from "@/store/api";
 
 export interface ReviewTarget {
@@ -170,6 +172,24 @@ export function useUserEmails(adminId: string): Map<string, string> {
     return useMemo(
         () => new Map((data ?? []).map((u) => [u.id, u.email])),
         [data],
+    );
+}
+
+/** User email in admin tables, linking to that user's page. */
+export function UserLink({
+    userId,
+    emails,
+}: {
+    userId: string;
+    emails: Map<string, string>;
+}) {
+    return (
+        <Link
+            href={adminUserRoute(userId)}
+            className="rounded-sm underline-offset-4 hover:text-primary hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        >
+            {emails.get(userId) ?? userId}
+        </Link>
     );
 }
 

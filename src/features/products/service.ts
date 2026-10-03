@@ -1,3 +1,4 @@
+import { assertMoneyMovementOpen } from "@/data/api/bridge";
 import { getRepository, withLatency } from "@/data/client";
 import type { Repository } from "@/data/repository";
 import { requirePlanUpgrade } from "@/domain/cards";
@@ -141,6 +142,7 @@ export function selectCardPlan(
     userId: string,
     input: CardPlanInput,
 ): Promise<AnyRequest> {
+    assertMoneyMovementOpen();
     return withLatency(() => {
         const repo = getRepository();
         const user = requireVerifiedUser(repo, userId);
@@ -168,6 +170,7 @@ export function orderPhysicalCard(
     userId: string,
     input: PhysicalCardInput,
 ): Promise<AnyRequest> {
+    assertMoneyMovementOpen();
     return withLatency(() => {
         const repo = getRepository();
         requireVerifiedUser(repo, userId);
