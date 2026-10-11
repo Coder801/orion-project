@@ -8,4 +8,6 @@ export const brandHex = {
     accent: "#00F5D4",
     pink: "#FF4ECD",
     warning: "#FFB020",
+    /** Orbit of the logo (components/LogoArt.tsx). */
+    orbit: "#00AEEF",
 } as const;
